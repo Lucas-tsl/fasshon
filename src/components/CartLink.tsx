@@ -6,6 +6,15 @@ import { useCart } from "@/lib/cart-context";
 import { formatPrice } from "@/lib/format";
 import { ProductImage } from "./ProductImage";
 
+function CartIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+      <path d="M6 8h12l-1.2 11.2a1.5 1.5 0 0 1-1.5 1.3H8.7a1.5 1.5 0 0 1-1.5-1.3L6 8Z" strokeLinejoin="round" />
+      <path d="M9 8V6a3 3 0 0 1 6 0v2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function CartLink() {
   const { items, count, subtotalCents, removeItem } = useCart();
   const [open, setOpen] = useState(false);
@@ -27,11 +36,13 @@ export function CartLink() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="relative flex items-center gap-1 transition-colors hover:text-accent"
+        aria-label="Panier"
+        title="Panier"
+        className="relative flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground/70 transition-colors hover:border-foreground/60 hover:text-foreground"
       >
-        Panier
+        <CartIcon />
         {count > 0 ? (
-          <span className="ml-1 rounded-full bg-accent px-1.5 py-0.5 text-xs text-accent-foreground animate-fade-in">
+          <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] text-accent-foreground animate-fade-in">
             {count}
           </span>
         ) : null}

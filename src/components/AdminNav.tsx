@@ -12,6 +12,9 @@ export function AdminNav() {
           <Link href="/admin/produits" className="hover:underline">
             Produits
           </Link>
+          <Link href="/admin/blog" className="hover:underline">
+            Blog
+          </Link>
         </nav>
         <form action={logout}>
           <button type="submit" className="text-sm text-foreground/60 hover:underline">

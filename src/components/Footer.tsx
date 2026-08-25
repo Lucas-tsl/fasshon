@@ -42,6 +42,9 @@ export async function Footer() {
           <Link href="/marques" className="text-foreground/60 hover:text-accent">
             Nos marques
           </Link>
+          <Link href="/blog" className="text-foreground/60 hover:text-accent">
+            Blog
+          </Link>
           <Link href="/panier" className="text-foreground/60 hover:text-accent">
             Panier
           </Link>

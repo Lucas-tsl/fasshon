@@ -10,6 +10,7 @@ import { Footer } from "@/components/Footer";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/user-auth";
 import { AccountIcon } from "@/components/AccountIcon";
+import { SearchBar } from "@/components/SearchBar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -68,6 +69,10 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                     Catalogue
                   </Link>
                   <BrandsMenu brands={brands} />
+                  <Link href="/blog" className="transition-colors hover:text-accent">
+                    Blog
+                  </Link>
+                  <SearchBar />
                   <AccountIcon connected={!!user} />
                   <CartLink />
                 </nav>
