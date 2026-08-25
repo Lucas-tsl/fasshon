@@ -3,31 +3,7 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { parse } from "csv-parse/sync";
 import { prisma } from "../src/lib/prisma";
-
-// Classement dédié Physiomins (nutrition/compléments) : les catégories
-// génériques du reste du site (soins/maquillage) ne collent pas à ce
-// catalogue alimentaire. On s'appuie sur la vraie colonne "Catégorie" du
-// CSV, avec quelques priorités par nom pour les cas ambigus (ex: desserts
-// vs. snacks salés, tous deux tagués "Snack" côté fournisseur).
-function classifyPhysiomins(name: string, category: string): string {
-  const n = name.toLowerCase();
-  const c = category.toLowerCase();
-
-  if (/gourde|shaker|brosse|roller/.test(n)) return "Accessoires & Divers";
-  if (/madeleine|brownie|biscuit|gaufrette|pâte à tartiner|crêpe|milk-shake|milkshake/.test(n))
-    return "Desserts & Douceurs";
-  if (/apéritif|chips/.test(c) || /chips/.test(n)) return "Entrées & Apéritif";
-  if (/digestion|microbiote/.test(c)) return "Digestifs & Microbiote";
-  if (/draineur|brûle-graisse|coupe faim|minceur/.test(c)) return "Minceur & Drainage";
-  if (/nutrition protéinée|petit-déjeuner|substituts de repas|soupes|plats/.test(c))
-    return "Plats & Repas protéinés";
-  if (/snack/.test(c)) return "Desserts & Douceurs";
-  if (
-    /vitalité|énergie|beauté|peau|sommeil|immunité|circulation|compléments alimentaires/.test(c)
-  )
-    return "Compléments & Bien-être";
-  return "Compléments & Bien-être";
-}
+import { classifyPhysiomins } from "../src/lib/classify-physiomins";
 
 // Importeur dédié pour l'export Physiomins, format différent de
 // WooCommerce (PrestaShop, séparateur point-virgule, pas de description

@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { parse } from "csv-parse/sync";
 import { prisma } from "../src/lib/prisma";
 import { inferProductType } from "../src/lib/product-type";
+import { classifyPurEden } from "../src/lib/classify-pur-eden";
 
 // Importeur générique pour les exports produits WooCommerce (format commun
 // à Les Senteurs Gourmandes, JOZZ Beauty et Pur Eden). Usage :
@@ -81,6 +82,7 @@ async function main() {
   console.log(`${rows.length} lignes, ${published.length} publiées (le reste = brouillon/privé, exclu).`);
 
   const publicDir = join(process.cwd(), "public", "products", brandSlug);
+  const classifyType = brandSlug === "pur-eden" ? classifyPurEden : inferProductType;
 
   let imported = 0;
   let skipped = 0;
@@ -122,7 +124,7 @@ async function main() {
         sku,
         stock,
         images: JSON.stringify(images),
-        productType: inferProductType(name),
+        productType: classifyType(name),
         active: true,
         categoryId: category.id,
         brandId: brand.id,
@@ -136,7 +138,7 @@ async function main() {
         sku,
         stock,
         images: JSON.stringify(images),
-        productType: inferProductType(name),
+        productType: classifyType(name),
         active: true,
         categoryId: category.id,
         brandId: brand.id,

@@ -12,8 +12,8 @@ import { getWishlistedProductIds } from "@/lib/wishlist";
 const SHOWCASE_TYPE_BY_BRAND: Record<string, string> = {
   "jozz-beauty": "Palettes & Maquillage yeux",
   "les-senteurs-gourmandes": "Parfums",
-  "pur-eden": "Sérums, crèmes & soins visage",
-  physiomins: "Compléments & Bien-être",
+  "pur-eden": "Hydratant",
+  physiomins: "Complément",
 };
 
 const TYPE_EMOJI: Record<string, string> = {
@@ -24,10 +24,17 @@ const TYPE_EMOJI: Record<string, string> = {
   Teint: "✨",
   "Sérums, crèmes & soins visage": "🧴",
   "Compléments & Bien-être": "🌿",
-  "Plats & Repas protéinés": "🍲",
-  "Desserts & Douceurs": "🍪",
-  "Minceur & Drainage": "💧",
   "Accessoires & Divers": "👜",
+  Complément: "🌿",
+  Crème: "🧴",
+  Nutrition: "🍲",
+  Cures: "💊",
+  "Anti-gaspi": "♻️",
+  Accessoire: "👜",
+  Nettoyant: "🧼",
+  Hydratant: "💧",
+  Protection: "☀️",
+  soins: "🧴",
 };
 
 export default async function Home() {

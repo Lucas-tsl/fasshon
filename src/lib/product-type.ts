@@ -6,10 +6,11 @@
 // signaux faibles ("kit", "set", très employés dans des sens différents)
 // en dernier recours seulement.
 //
-// Utilisée telle quelle pour JOZZ Beauty et Pur Eden (le nom du produit
-// suffit). Les Senteurs Gourmandes et Physiomins ont leur propre
-// classificateur (scripts/import-lsg-scraped.ts, scripts/import-physiomins.ts)
-// car leurs catégories réelles sont bien plus fiables que le nom seul.
+// Utilisée telle quelle pour JOZZ Beauty (le nom du produit suffit). Les
+// Senteurs Gourmandes, Physiomins et Pur Eden ont leur propre
+// classificateur dédié (src/lib/classify-physiomins.ts,
+// src/lib/classify-pur-eden.ts, scripts/import-lsg-scraped.ts) pour
+// coller à la façon dont chaque marque doit être parcourue.
 
 type Rule = { type: string; keywords: string[] };
 
@@ -93,8 +94,11 @@ export function inferProductType(name: string): string {
 // de l'ordre des règles ci-dessus) pour satisfaire l'ordre voulu par
 // marque une fois filtré à ses propres types : LSG doit afficher Brumes,
 // Coffrets, Parfums puis Accessoires ; JOZZ doit afficher Lèvres, Teint,
-// Yeux, Ongles, Coffrets puis Autres. Un seul ordre global peut satisfaire
-// les deux car chaque marque ne voit que ses propres types filtrés.
+// Yeux, Ongles, Coffrets puis Autres ; Physiomins doit afficher
+// Complément, Crème, Nutrition, Cures, Anti-gaspi puis Accessoire ; Pur
+// Eden doit afficher Nettoyant, Hydratant, Protection puis soins. Un seul
+// ordre global peut satisfaire tout ça car chaque marque ne voit que ses
+// propres types filtrés.
 export const PRODUCT_TYPE_ORDER: string[] = [
   "Brumes & Eaux parfumées",
   "Lèvres",
@@ -114,10 +118,15 @@ export const PRODUCT_TYPE_ORDER: string[] = [
   "Sérums, crèmes & soins visage",
   "Compléments & Bien-être",
   "Épilation",
-  "Plats & Repas protéinés",
-  "Entrées & Apéritif",
-  "Desserts & Douceurs",
-  "Digestifs & Microbiote",
-  "Minceur & Drainage",
+  "Complément",
+  "Crème",
+  "Nutrition",
+  "Cures",
+  "Anti-gaspi",
+  "Accessoire",
+  "Nettoyant",
+  "Hydratant",
+  "Protection",
+  "soins",
   "Autres",
 ];
