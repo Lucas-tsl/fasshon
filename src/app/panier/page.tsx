@@ -5,6 +5,32 @@ import { useState } from "react";
 import { useCart } from "@/lib/cart-context";
 import { formatPrice } from "@/lib/format";
 import { ProductImage } from "@/components/ProductImage";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { TrustBadges } from "@/components/TrustBadges";
+
+function CheckoutSteps({ step }: { step: 1 | 2 }) {
+  return (
+    <ol className="flex items-center gap-2 text-xs text-foreground/50">
+      <li className={`flex items-center gap-1.5 ${step === 1 ? "font-medium text-accent" : ""}`}>
+        <span
+          className={`flex h-5 w-5 items-center justify-center rounded-full border text-[10px] ${step === 1 ? "border-accent bg-accent text-accent-foreground" : "border-border"}`}
+        >
+          1
+        </span>
+        Panier
+      </li>
+      <span aria-hidden="true">—</span>
+      <li className={`flex items-center gap-1.5 ${step === 2 ? "font-medium text-accent" : ""}`}>
+        <span
+          className={`flex h-5 w-5 items-center justify-center rounded-full border text-[10px] ${step === 2 ? "border-accent bg-accent text-accent-foreground" : "border-border"}`}
+        >
+          2
+        </span>
+        Paiement sécurisé
+      </li>
+    </ol>
+  );
+}
 
 export default function PanierPage() {
   const { items, setQuantity, removeItem, subtotalCents } = useCart();
@@ -42,6 +68,7 @@ export default function PanierPage() {
   if (items.length === 0) {
     return (
       <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 px-4 py-20 text-center">
+        <Breadcrumb items={[{ label: "Panier" }]} />
         <h1 className="text-2xl font-semibold">Votre panier est vide</h1>
         <Link href="/produits" className="text-accent hover:underline">
           Voir le catalogue
@@ -52,7 +79,11 @@ export default function PanierPage() {
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-10">
-      <h1 className="text-2xl font-semibold">Votre panier</h1>
+      <Breadcrumb items={[{ label: "Panier" }]} />
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">Votre panier</h1>
+        <CheckoutSteps step={1} />
+      </div>
 
       <ul className="flex flex-col gap-4">
         {items.map((item) => (
@@ -123,6 +154,12 @@ export default function PanierPage() {
       >
         {loading ? "Redirection vers le paiement…" : "Passer commande"}
       </button>
+
+      <TrustBadges />
+
+      <Link href="/produits" className="text-center text-sm text-foreground/60 hover:underline">
+        Continuer mes achats
+      </Link>
     </div>
   );
 }

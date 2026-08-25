@@ -16,6 +16,7 @@
     "pg": "^8.23.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "resend": "^6.22.1",
     "stripe": "^22.5.0"
   },
   "devDependencies": {

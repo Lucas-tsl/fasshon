@@ -39,20 +39,56 @@ export default async function CommandeSuccesPage({
   const order = await recordOrderFromCheckoutSession(session);
 
   return (
-    <div className="mx-auto max-w-xl px-4 py-20 text-center">
+    <div className="mx-auto max-w-xl px-4 py-16">
       <ClearCartOnMount />
-      <h1 className="text-2xl font-semibold">Merci pour votre commande !</h1>
-      <p className="mt-2 text-foreground/70">
-        Un e-mail de confirmation a été envoyé à {session.customer_details?.email}.
-      </p>
-      {order ? (
-        <p className="mt-4 text-sm text-foreground/60">
-          Commande n° {order.id.slice(-8).toUpperCase()} — {formatPrice(order.totalCents)}
+      <div className="text-center">
+        <span className="text-4xl" aria-hidden="true">
+          🎉
+        </span>
+        <h1 className="mt-3 text-2xl font-semibold">Merci pour votre commande !</h1>
+        <p className="mt-2 text-foreground/70">
+          Un e-mail de confirmation a été envoyé à {session.customer_details?.email}.
         </p>
+      </div>
+
+      {order ? (
+        <div className="mt-8 flex flex-col gap-4 rounded-xl border border-border p-5">
+          <div className="flex items-center justify-between text-sm">
+            <span className="font-medium">Commande n° {order.id.slice(-8).toUpperCase()}</span>
+            <span className="text-foreground/60">
+              {order.createdAt.toLocaleDateString("fr-FR")}
+            </span>
+          </div>
+
+          <ul className="flex flex-col gap-2 border-t border-border pt-3 text-sm">
+            {order.items.map((item) => (
+              <li key={item.id} className="flex items-center justify-between">
+                <span className="text-foreground/70">
+                  {item.quantity} × {item.nameSnap}
+                  {item.variantNameSnap ? ` (${item.variantNameSnap})` : ""}
+                </span>
+                <span className="font-medium">{formatPrice(item.priceCents * item.quantity)}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="flex items-center justify-between border-t border-border pt-3 text-sm font-semibold">
+            <span>Total</span>
+            <span>{formatPrice(order.totalCents)}</span>
+          </div>
+        </div>
       ) : null}
-      <Link href="/produits" className="mt-6 inline-block text-accent hover:underline">
-        Continuer mes achats
-      </Link>
+
+      <p className="mt-6 text-center text-xs text-foreground/50">
+        Votre commande est transmise à notre équipe pour préparation. Vous recevrez un
+        suivi dès son expédition.
+      </p>
+
+      <div className="mt-6 text-center">
+        <Link href="/produits" className="text-accent hover:underline">
+          Continuer mes achats
+        </Link>
+      </div>
     </div>
   );
 }

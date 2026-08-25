@@ -5,12 +5,17 @@
 // ambiguïté (coffret, calendrier...) sont testées en premier ; les
 // signaux faibles ("kit", "set", très employés dans des sens différents)
 // en dernier recours seulement.
+//
+// Utilisée telle quelle pour JOZZ Beauty et Pur Eden (le nom du produit
+// suffit). Les Senteurs Gourmandes et Physiomins ont leur propre
+// classificateur (scripts/import-lsg-scraped.ts, scripts/import-physiomins.ts)
+// car leurs catégories réelles sont bien plus fiables que le nom seul.
 
 type Rule = { type: string; keywords: string[] };
 
 const RULES: Rule[] = [
   { type: "Coffrets & Sets cadeaux", keywords: ["coffret", "calendrier", "cracker", "cadeau"] },
-  { type: "Accessoires & Trousses", keywords: ["porte-clés", "porte-cles"] },
+  { type: "Accessoires & Divers", keywords: ["porte-clés", "porte-cles"] },
   // "Brumes" doit être vérifié avant "Parfums" : une brume est aussi taguée
   // "parfumée" dans ses catégories, le mot "parfum" seul ne doit donc pas
   // l'emporter sur le signal plus précis "brume".
@@ -33,8 +38,10 @@ const RULES: Rule[] = [
   { type: "Sérums, crèmes & soins visage", keywords: ["sérum", "serum", "crème", "creme", "concentré", "concentre", "fluide", "masque", "soin"] },
   { type: "Compléments & Bien-être", keywords: ["cure", "complément", "complement", "barre", "collagène", "collagene", "drainant", "protéin", "proteine"] },
   { type: "Épilation", keywords: ["dépilatoire", "depilatoire"] },
-  { type: "Accessoires & Trousses", keywords: ["trousse", "sac ", "vanity", "pinceau", "chouchou", "bougie", "vaporisateur", "pochon"] },
-  { type: "Sets & Kits", keywords: ["kit", " set", "set "] },
+  {
+    type: "Accessoires & Divers",
+    keywords: ["trousse", "sac ", "vanity", "pinceau", "chouchou", "bougie", "vaporisateur", "pochon", "kit", " set", "set "],
+  },
 ];
 
 export function inferProductType(name: string): string {
@@ -47,9 +54,15 @@ export function inferProductType(name: string): string {
   return "Autres";
 }
 
-// Ordre d'affichage préféré des types (celui des règles ci-dessus, sans
-// doublons), avec "Autres" toujours en dernier.
+// Ordre d'affichage préféré des types. Chaque marque peut introduire ses
+// propres libellés (ex. "Digestifs & Microbiote" pour Physiomins) : ceux
+// qui ne figurent pas ici sont simplement affichés après, avant "Autres".
 export const PRODUCT_TYPE_ORDER: string[] = [
   ...Array.from(new Set(RULES.map((r) => r.type))),
+  "Plats & Repas protéinés",
+  "Entrées & Apéritif",
+  "Desserts & Douceurs",
+  "Digestifs & Microbiote",
+  "Minceur & Drainage",
   "Autres",
 ];

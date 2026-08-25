@@ -1,5 +1,10 @@
 import type Stripe from "stripe";
+import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
+import { getResend, EMAIL_FROM } from "@/lib/resend";
+import { formatPrice } from "@/lib/format";
+
+type OrderWithItems = Prisma.OrderGetPayload<{ include: { items: true } }>;
 
 type CartMetaEntry = { p: string; v: string | null; q: number };
 
@@ -29,7 +34,7 @@ export async function recordOrderFromCheckoutSession(session: Stripe.Checkout.Se
     include: { variants: true },
   });
 
-  return prisma.$transaction(async (tx) => {
+  const order = await prisma.$transaction(async (tx) => {
     const order = await tx.order.create({
       data: {
         stripeSessionId: session.id,
@@ -73,4 +78,32 @@ export async function recordOrderFromCheckoutSession(session: Stripe.Checkout.Se
 
     return order;
   });
+
+  await sendOrderConfirmationEmail(order);
+
+  return order;
+}
+
+async function sendOrderConfirmationEmail(order: OrderWithItems | null) {
+  if (!order || order.email === "inconnu") return;
+  const resend = getResend();
+  if (!resend) return;
+
+  const lines = order.items
+    .map(
+      (item) =>
+        `${item.quantity} × ${item.nameSnap}${item.variantNameSnap ? ` (${item.variantNameSnap})` : ""} — ${formatPrice(item.priceCents * item.quantity)}`,
+    )
+    .join("\n");
+
+  try {
+    await resend.emails.send({
+      from: EMAIL_FROM,
+      to: order.email,
+      subject: `Confirmation de votre commande n°${order.id.slice(-8).toUpperCase()}`,
+      text: `Merci pour votre commande !\n\n${lines}\n\nTotal : ${formatPrice(order.totalCents)}\n\nNous la préparons dès que possible.`,
+    });
+  } catch {
+    // La commande reste valide même si l'email échoue.
+  }
 }

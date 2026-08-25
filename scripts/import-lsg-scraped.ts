@@ -2,7 +2,24 @@ import "dotenv/config";
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { prisma } from "../src/lib/prisma";
-import { inferProductType } from "../src/lib/product-type";
+
+// Classement dédié LSG : exactement les 4 familles du catalogue.
+function classifyLsg(name: string, categories: string[]): string {
+  const nameLower = name.toLowerCase();
+  const text = `${name} ${categories.join(" ")}`.toLowerCase();
+  // "coffret" doit être vérifié sur le NOM uniquement : les catégories
+  // promotionnelles LSG combinent parfois plusieurs familles dans un même
+  // libellé (ex. "French Days – Parfums & Coffrets"), qui matcherait à
+  // tort tous les parfums s'il était pris en compte ici.
+  if (/coffret|calendrier|cracker/.test(nameLower)) return "Coffrets & Sets cadeaux";
+  if (/brume/.test(text)) return "Brumes & Eaux parfumées";
+  if (/gel douche|shampoing|set découverte|set decouverte|huile/.test(text))
+    return "Accessoires & Divers";
+  // Le reste du catalogue LSG est du parfum, même quand la fiche ne porte
+  // pas explicitement le tag "Eaux de Parfum" (cas des références "fin de
+  // collection", taguées différemment côté fournisseur).
+  return "Parfums";
+}
 
 // Importeur pour Les Senteurs Gourmandes à partir de données extraites des
 // fiches produits publiques du site (nom, description, catégories, prix,
@@ -65,8 +82,7 @@ async function main() {
     // On ne garde que des catégories vraiment "typées" (pas les tags marketing
     // comme "Idées cadeaux de noël", qui ferait sinon classer plein de
     // parfums en Coffrets à cause du mot "cadeaux").
-    const typeHints = entry.categories.filter((c) => /parfum/i.test(c) || /brume/i.test(c));
-    const productType = inferProductType(`${entry.name} ${typeHints.join(" ")}`);
+    const productType = classifyLsg(entry.name, entry.categories);
 
     let images: string[] = [];
     if (entry.image) {
@@ -110,6 +126,12 @@ async function main() {
       });
 
       for (const [i, v] of entry.variants.entries()) {
+        let variantImage: string | null = null;
+        if (v.image) {
+          const fileName = await downloadImage(v.image, publicDir, `${entry.slug}-${v.sku}`);
+          if (fileName) variantImage = `/products/les-senteurs-gourmandes/${fileName}`;
+        }
+
         await prisma.productVariant.upsert({
           where: { sku: v.sku },
           update: {
@@ -117,6 +139,7 @@ async function main() {
             priceCents: v.priceCents,
             stock: v.stock,
             position: i,
+            image: variantImage,
             productId: saved.id,
           },
           create: {
@@ -125,6 +148,7 @@ async function main() {
             priceCents: v.priceCents,
             stock: v.stock,
             position: i,
+            image: variantImage,
             productId: saved.id,
           },
         });

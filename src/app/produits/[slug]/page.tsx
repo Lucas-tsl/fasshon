@@ -2,8 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/format";
-import { ProductImage } from "@/components/ProductImage";
-import { AddToCartButton } from "@/components/AddToCartButton";
+import { ProductGallery } from "@/components/ProductGallery";
 import { parseImages } from "@/lib/product-display";
 import { Breadcrumb } from "@/components/Breadcrumb";
 
@@ -36,57 +35,67 @@ export default async function ProductPage({
           { label: product.name },
         ]}
       />
-      <div className="flex flex-col gap-8 md:flex-row">
-      <ProductImage
-        images={parseImages(product.images)}
-        name={product.name}
-        categorySlug={product.category.slug}
-        className="aspect-square w-full md:w-1/2"
-        sizes="(min-width: 768px) 50vw, 100vw"
+
+      <ProductGallery
+        product={{
+          id: product.id,
+          slug: product.slug,
+          name: product.name,
+          priceCents: product.priceCents,
+          stock: product.stock,
+          brandName: product.brand.name,
+          categorySlug: product.category.slug,
+          image: parseImages(product.images)[0] ?? null,
+        }}
+        variants={product.variants.map((v) => ({
+          id: v.id,
+          name: v.name,
+          priceCents: v.priceCents,
+          stock: v.stock,
+          image: v.image,
+        }))}
       />
 
-      <div className="flex flex-1 flex-col gap-4">
-        <Link
-          href={`/produits?categorie=${product.category.slug}`}
-          className="text-sm text-foreground/60 hover:underline"
-        >
-          {product.category.name}
-        </Link>
-
-        <h1 className="text-2xl font-semibold">{product.name}</h1>
-
-        {product.variants.length === 0 && product.compareAtCents ? (
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-semibold">{formatPrice(product.priceCents)}</span>
-            <span className="text-foreground/40 line-through">
-              {formatPrice(product.compareAtCents)}
-            </span>
+      <div className="grid gap-6 border-t border-border pt-6 md:grid-cols-[1fr_18rem]">
+        <div className="flex flex-col gap-4">
+          <div>
+            <Link
+              href={`/produits?categorie=${product.category.slug}`}
+              className="text-sm text-foreground/60 hover:underline"
+            >
+              {product.category.name}
+            </Link>
+            <h1 className="text-2xl font-semibold">{product.name}</h1>
           </div>
-        ) : null}
 
-        <p className="text-sm leading-relaxed text-foreground/70">{product.description}</p>
+          {product.variants.length === 0 && product.compareAtCents ? (
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-semibold">{formatPrice(product.priceCents)}</span>
+              <span className="text-foreground/40 line-through">
+                {formatPrice(product.compareAtCents)}
+              </span>
+            </div>
+          ) : null}
 
-        <p className="text-xs text-foreground/50">SKU : {product.sku}</p>
+          <p className="text-sm leading-relaxed text-foreground/70">{product.description}</p>
 
-        <AddToCartButton
-          product={{
-            id: product.id,
-            slug: product.slug,
-            name: product.name,
-            priceCents: product.priceCents,
-            stock: product.stock,
-            brandName: product.brand.name,
-            categorySlug: product.category.slug,
-            image: parseImages(product.images)[0] ?? null,
-          }}
-          variants={product.variants.map((v) => ({
-            id: v.id,
-            name: v.name,
-            priceCents: v.priceCents,
-            stock: v.stock,
-          }))}
-        />
-      </div>
+          <p className="text-xs text-foreground/50">SKU : {product.sku}</p>
+        </div>
+
+        <ul className="flex flex-col gap-3 text-sm text-foreground/70">
+          <li className="flex items-center gap-2">
+            <span aria-hidden="true">🔒</span> Paiement 100% sécurisé
+          </li>
+          <li className="flex items-center gap-2">
+            <span aria-hidden="true">📦</span> Livraison suivie
+          </li>
+          <li className="flex items-center gap-2">
+            <span aria-hidden="true">↩️</span> Retours sous 14 jours
+          </li>
+          <li className="flex items-center gap-2">
+            <span aria-hidden="true">🇫🇷</span> Marque française authentique
+          </li>
+        </ul>
       </div>
     </div>
   );

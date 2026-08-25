@@ -65,7 +65,14 @@ model ProductVariant {
   stock      Int         @default(0)
   active     Boolean     @default(true)
   position   Int         @default(0)
+  image      String? // photo spécifique à cette variante, sinon celle du produit
   orderItems OrderItem[]
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
 }
 
 enum OrderStatus {
