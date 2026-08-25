@@ -4,7 +4,6 @@ import { ProductCard } from "@/components/ProductCard";
 import { toCardProduct } from "@/lib/product-display";
 import { BrandLogo } from "@/components/BrandLogo";
 import { Carousel, CarouselItem } from "@/components/Carousel";
-import { TrustBadges } from "@/components/TrustBadges";
 import { PRODUCT_TYPE_ORDER } from "@/lib/product-type";
 
 const TYPE_EMOJI: Record<string, string> = {
@@ -78,10 +77,6 @@ export default async function Home() {
             Découvrir nos marques
           </Link>
         </div>
-      </section>
-
-      <section className="border-b border-border px-4 py-8">
-        <TrustBadges className="mx-auto max-w-5xl" />
       </section>
 
       <section className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 py-10">
