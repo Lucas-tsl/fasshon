@@ -75,6 +75,15 @@ model NewsletterSubscriber {
   createdAt DateTime @default(now())
 }
 
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime @default(now())
+  orders       Order[]
+}
+
 enum OrderStatus {
   PENDING
   PAID
@@ -88,6 +97,8 @@ model Order {
   email           String
   status          OrderStatus @default(PENDING)
   totalCents      Int
+  user            User?       @relation(fields: [userId], references: [id])
+  userId          String?
   items           OrderItem[]
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt

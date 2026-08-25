@@ -8,6 +8,7 @@ import { BrandsMenu } from "@/components/BrandsMenu";
 import { AnnouncementBar } from "@/components/AnnouncementBar";
 import { Footer } from "@/components/Footer";
 import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/user-auth";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,10 +40,13 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const brands = await prisma.brand.findMany({
-    orderBy: { name: "asc" },
-    select: { slug: true, name: true },
-  });
+  const [brands, user] = await Promise.all([
+    prisma.brand.findMany({
+      orderBy: { name: "asc" },
+      select: { slug: true, name: true },
+    }),
+    getCurrentUser(),
+  ]);
 
   return (
     <html
@@ -63,6 +67,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                     Catalogue
                   </Link>
                   <BrandsMenu brands={brands} />
+                  <Link href={user ? "/compte" : "/compte/connexion"} className="transition-colors hover:text-accent">
+                    {user ? "Mon compte" : "Connexion"}
+                  </Link>
                   <CartLink />
                 </nav>
               </div>

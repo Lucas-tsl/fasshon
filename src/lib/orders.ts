@@ -41,6 +41,7 @@ export async function recordOrderFromCheckoutSession(session: Stripe.Checkout.Se
         email: session.customer_details?.email ?? session.customer_email ?? "inconnu",
         status: "PAID",
         totalCents: session.amount_total ?? 0,
+        userId: session.metadata?.userId || null,
         items: {
           create: cart
             .map((entry) => {

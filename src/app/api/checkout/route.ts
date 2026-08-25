@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
+import { getCurrentUser } from "@/lib/user-auth";
 
 type CartInput = { productId: string; variantId: string | null; quantity: number };
 
@@ -99,6 +100,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const user = await getCurrentUser();
+
   let session;
   try {
     const stripe = getStripe();
@@ -107,7 +110,8 @@ export async function POST(request: NextRequest) {
       line_items: lineItems,
       success_url: `${request.nextUrl.origin}/commande/succes?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${request.nextUrl.origin}/panier`,
-      metadata: { cart: cartMeta },
+      customer_email: user?.email,
+      metadata: { cart: cartMeta, userId: user?.id ?? "" },
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Erreur Stripe.";
