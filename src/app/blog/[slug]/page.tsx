@@ -2,6 +2,9 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { BlogImage } from "@/components/BlogImage";
+import { ProductCard } from "@/components/ProductCard";
+import { toCardProduct } from "@/lib/product-display";
+import { getWishlistedProductIds } from "@/lib/wishlist";
 
 export default async function BlogPostPage({
   params,
@@ -10,7 +13,23 @@ export default async function BlogPostPage({
 }) {
   const { slug } = await params;
 
-  const post = await prisma.blogPost.findUnique({ where: { slug } });
+  const [post, wishlistedIds] = await Promise.all([
+    prisma.blogPost.findUnique({
+      where: { slug },
+      include: {
+        relatedProducts: {
+          where: { active: true },
+          include: {
+            category: true,
+            brand: true,
+            variants: { where: { active: true } },
+            reviews: { select: { rating: true } },
+          },
+        },
+      },
+    }),
+    getWishlistedProductIds(),
+  ]);
   if (!post || !post.published) {
     notFound();
   }
@@ -35,6 +54,21 @@ export default async function BlogPostPage({
           <p key={i}>{p}</p>
         ))}
       </div>
+
+      {post.relatedProducts.length > 0 ? (
+        <div className="flex flex-col gap-4 border-t border-border pt-6">
+          <h2 className="font-display text-2xl">Produits associés</h2>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+            {post.relatedProducts.map((product) => (
+              <ProductCard
+                key={product.slug}
+                product={toCardProduct(product)}
+                wishlisted={wishlistedIds.has(product.id)}
+              />
+            ))}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

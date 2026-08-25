@@ -3,7 +3,13 @@ import { AdminNav } from "@/components/AdminNav";
 import { createPost, updatePost, deletePost } from "./actions";
 
 export default async function AdminBlogPage() {
-  const posts = await prisma.blogPost.findMany({ orderBy: { publishedAt: "desc" } });
+  const [posts, products] = await Promise.all([
+    prisma.blogPost.findMany({
+      orderBy: { publishedAt: "desc" },
+      include: { relatedProducts: { select: { id: true } } },
+    }),
+    prisma.product.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
+  ]);
 
   return (
     <div>
@@ -50,6 +56,22 @@ export default async function AdminBlogPage() {
                 <label className="flex items-center gap-2 text-xs text-foreground/60">
                   <input type="checkbox" name="published" defaultChecked={post.published} />
                   Publié
+                </label>
+                <label className="flex flex-col gap-1 text-xs text-foreground/60">
+                  Produits associés (Ctrl/Cmd + clic pour en sélectionner plusieurs)
+                  <select
+                    name="productIds"
+                    multiple
+                    size={6}
+                    defaultValue={post.relatedProducts.map((p) => p.id)}
+                    className="rounded-lg border border-border bg-transparent px-3 py-2 text-sm"
+                  >
+                    {products.map((product) => (
+                      <option key={product.id} value={product.id}>
+                        {product.name}
+                      </option>
+                    ))}
+                  </select>
                 </label>
                 <div className="flex items-center gap-2">
                   <button
@@ -99,6 +121,21 @@ export default async function AdminBlogPage() {
               rows={6}
               className="rounded-lg border border-border bg-transparent px-3 py-2 text-sm"
             />
+            <label className="flex flex-col gap-1 text-xs text-foreground/60">
+              Produits associés (Ctrl/Cmd + clic pour en sélectionner plusieurs)
+              <select
+                name="productIds"
+                multiple
+                size={6}
+                className="rounded-lg border border-border bg-transparent px-3 py-2 text-sm"
+              >
+                {products.map((product) => (
+                  <option key={product.id} value={product.id}>
+                    {product.name}
+                  </option>
+                ))}
+              </select>
+            </label>
             <button
               type="submit"
               className="rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-foreground"

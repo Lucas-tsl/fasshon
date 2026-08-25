@@ -25,8 +25,17 @@ export async function createPost(formData: FormData) {
     throw new Error("Champs invalides.");
   }
 
+  const productIds = formData.getAll("productIds").map(String).filter(Boolean);
+
   await prisma.blogPost.create({
-    data: { title, excerpt, content, coverImage: coverImage || null, slug: slugify(title) },
+    data: {
+      title,
+      excerpt,
+      content,
+      coverImage: coverImage || null,
+      slug: slugify(title),
+      relatedProducts: { connect: productIds.map((id) => ({ id })) },
+    },
   });
 
   revalidatePath("/admin/blog");
@@ -47,9 +56,18 @@ export async function updatePost(formData: FormData) {
     throw new Error("Champs invalides.");
   }
 
+  const productIds = formData.getAll("productIds").map(String).filter(Boolean);
+
   const post = await prisma.blogPost.update({
     where: { id },
-    data: { title, excerpt, content, coverImage: coverImage || null, published },
+    data: {
+      title,
+      excerpt,
+      content,
+      coverImage: coverImage || null,
+      published,
+      relatedProducts: { set: productIds.map((pid) => ({ id: pid })) },
+    },
   });
 
   revalidatePath("/admin/blog");

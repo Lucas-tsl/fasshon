@@ -10,6 +10,8 @@ import { ProductFaq } from "@/components/ProductFaq";
 import { ProductCard } from "@/components/ProductCard";
 import { getCurrentUser } from "@/lib/user-auth";
 import { getWishlistedProductIds } from "@/lib/wishlist";
+import { Carousel, CarouselItem } from "@/components/Carousel";
+import { BlogImage } from "@/components/BlogImage";
 
 export default async function ProductPage({
   params,
@@ -60,6 +62,21 @@ export default async function ProductPage({
     orderBy: { name: "asc" },
     take: 4,
   });
+
+  // Articles qui parlent spécifiquement de ce produit en priorité, sinon
+  // les derniers articles publiés en découverte générale.
+  const linkedPosts = await prisma.blogPost.findMany({
+    where: { published: true, relatedProducts: { some: { id: product.id } } },
+    orderBy: { publishedAt: "desc" },
+  });
+  const relatedPosts =
+    linkedPosts.length > 0
+      ? linkedPosts
+      : await prisma.blogPost.findMany({
+          where: { published: true },
+          orderBy: { publishedAt: "desc" },
+          take: 6,
+        });
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10">
@@ -141,6 +158,22 @@ export default async function ProductPage({
       </div>
 
       <ProductFaq faqs={product.faqs} />
+
+      {relatedPosts.length > 0 ? (
+        <div className="flex flex-col gap-4 border-t border-border pt-6">
+          <h2 className="font-display text-2xl">À lire sur le blog</h2>
+          <Carousel>
+            {relatedPosts.map((post) => (
+              <CarouselItem key={post.slug}>
+                <Link href={`/blog/${post.slug}`} className="group flex flex-col gap-2">
+                  <BlogImage src={post.coverImage} title={post.title} className="aspect-[4/3] w-full" />
+                  <p className="text-sm font-medium group-hover:underline">{post.title}</p>
+                </Link>
+              </CarouselItem>
+            ))}
+          </Carousel>
+        </div>
+      ) : null}
 
       {similarProducts.length > 0 ? (
         <div className="flex flex-col gap-4 border-t border-border pt-6">

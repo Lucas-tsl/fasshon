@@ -49,6 +49,7 @@ model Product {
   wishedBy       WishlistItem[]
   reviews        Review[]
   faqs           ProductFaq[]
+  blogPosts      BlogPost[]       @relation("BlogPostProducts")
   category       Category         @relation(fields: [categoryId], references: [id])
   categoryId     String
   brand          Brand            @relation(fields: [brandId], references: [id])
@@ -172,14 +173,15 @@ model OrderItem {
 }
 
 model BlogPost {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  title       String
-  excerpt     String
-  content     String
-  coverImage  String?
-  published   Boolean  @default(true)
-  publishedAt DateTime @default(now())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  title           String
+  excerpt         String
+  content         String
+  coverImage      String?
+  published       Boolean   @default(true)
+  publishedAt     DateTime  @default(now())
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  relatedProducts Product[] @relation("BlogPostProducts")
 }
