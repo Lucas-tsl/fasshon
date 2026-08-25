@@ -48,6 +48,7 @@ model Product {
   bestSeller     Boolean          @default(false)
   wishedBy       WishlistItem[]
   reviews        Review[]
+  faqs           ProductFaq[]
   category       Category         @relation(fields: [categoryId], references: [id])
   categoryId     String
   brand          Brand            @relation(fields: [brandId], references: [id])
@@ -125,6 +126,15 @@ model Review {
   createdAt DateTime @default(now())
 
   @@unique([userId, productId])
+}
+
+model ProductFaq {
+  id        String  @id @default(cuid())
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+  question  String
+  answer    String
+  position  Int     @default(0)
 }
 
 enum OrderStatus {

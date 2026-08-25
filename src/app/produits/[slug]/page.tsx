@@ -2,11 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { ProductGallery } from "@/components/ProductGallery";
-import { parseImages } from "@/lib/product-display";
+import { parseImages, toCardProduct } from "@/lib/product-display";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { StarRating } from "@/components/StarRating";
 import { ReviewForm } from "@/components/ReviewForm";
+import { ProductFaq } from "@/components/ProductFaq";
+import { ProductCard } from "@/components/ProductCard";
 import { getCurrentUser } from "@/lib/user-auth";
+import { getWishlistedProductIds } from "@/lib/wishlist";
 
 export default async function ProductPage({
   params,
@@ -15,7 +18,7 @@ export default async function ProductPage({
 }) {
   const { slug } = await params;
 
-  const [product, currentUser] = await Promise.all([
+  const [product, currentUser, wishlistedIds] = await Promise.all([
     prisma.product.findUnique({
       where: { slug },
       include: {
@@ -23,9 +26,11 @@ export default async function ProductPage({
         brand: true,
         variants: { where: { active: true }, orderBy: { position: "asc" } },
         reviews: { include: { user: true }, orderBy: { createdAt: "desc" } },
+        faqs: { orderBy: { position: "asc" } },
       },
     }),
     getCurrentUser(),
+    getWishlistedProductIds(),
   ]);
 
   if (!product || !product.active) {
@@ -39,6 +44,22 @@ export default async function ProductPage({
   const myReview = currentUser
     ? product.reviews.find((r) => r.userId === currentUser.id)
     : undefined;
+
+  const similarProducts = await prisma.product.findMany({
+    where: {
+      id: { not: product.id },
+      active: true,
+      productType: product.productType,
+    },
+    include: {
+      category: true,
+      brand: true,
+      variants: { where: { active: true } },
+      reviews: { select: { rating: true } },
+    },
+    orderBy: { name: "asc" },
+    take: 4,
+  });
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10">
@@ -118,6 +139,23 @@ export default async function ProductPage({
           </p>
         )}
       </div>
+
+      <ProductFaq faqs={product.faqs} />
+
+      {similarProducts.length > 0 ? (
+        <div className="flex flex-col gap-4 border-t border-border pt-6">
+          <h2 className="font-display text-2xl">Vous aimerez aussi</h2>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {similarProducts.map((p) => (
+              <ProductCard
+                key={p.slug}
+                product={toCardProduct(p)}
+                wishlisted={wishlistedIds.has(p.id)}
+              />
+            ))}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

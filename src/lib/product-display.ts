@@ -15,6 +15,7 @@ type ProductForCard = {
   category: { slug: string };
   brand: { name: string };
   variants: { priceCents: number }[];
+  reviews: { rating: number }[];
 };
 
 export type CardProduct = ReturnType<typeof toCardProduct>;
@@ -47,6 +48,11 @@ export function toCardProduct(product: ProductForCard) {
     productType: product.productType ?? "Autres",
     bestSeller: product.bestSeller,
     isNew: Date.now() - product.createdAt.getTime() < NEW_WINDOW_DAYS * 24 * 60 * 60 * 1000,
+    reviewCount: product.reviews.length,
+    averageRating:
+      product.reviews.length > 0
+        ? product.reviews.reduce((sum, r) => sum + r.rating, 0) / product.reviews.length
+        : 0,
   };
 }
 

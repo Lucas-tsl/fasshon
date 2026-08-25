@@ -22,7 +22,12 @@ export default async function MarquePage({
       include: {
         products: {
           where: { active: true },
-          include: { category: true, brand: true, variants: { where: { active: true } } },
+          include: {
+            category: true,
+            brand: true,
+            variants: { where: { active: true } },
+            reviews: { select: { rating: true } },
+          },
           orderBy: { name: "asc" },
         },
       },

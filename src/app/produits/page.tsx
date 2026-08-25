@@ -28,7 +28,12 @@ export default async function ProduitsPage({
         ...(categorie ? { category: { slug: categorie } } : {}),
         ...(marque ? { brand: { slug: marque } } : {}),
       },
-      include: { category: true, brand: true, variants: { where: { active: true } } },
+      include: {
+        category: true,
+        brand: true,
+        variants: { where: { active: true } },
+        reviews: { select: { rating: true } },
+      },
       orderBy: { name: "asc" },
     }),
     getWishlistedProductIds(),

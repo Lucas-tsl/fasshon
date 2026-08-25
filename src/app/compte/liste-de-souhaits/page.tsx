@@ -18,7 +18,12 @@ export default async function WishlistPage() {
     where: { userId: user.id },
     include: {
       product: {
-        include: { category: true, brand: true, variants: { where: { active: true } } },
+        include: {
+          category: true,
+          brand: true,
+          variants: { where: { active: true } },
+          reviews: { select: { rating: true } },
+        },
       },
     },
     orderBy: { createdAt: "desc" },
