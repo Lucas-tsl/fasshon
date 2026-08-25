@@ -11,6 +11,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/user-auth";
 import { AccountIcon } from "@/components/AccountIcon";
 import { SearchBar } from "@/components/SearchBar";
+import { MobileMenu } from "@/components/MobileMenu";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -62,10 +63,11 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
             <header className="border-b border-border bg-background/90 px-4 py-3 backdrop-blur-sm">
               <div className="mx-auto flex max-w-6xl items-center justify-between">
                 <div className="flex items-center gap-6">
+                  <MobileMenu brands={brands} />
                   <Link href="/" className="font-display text-2xl tracking-wide">
                     Fasshon
                   </Link>
-                  <nav className="flex items-center gap-6 text-sm font-medium">
+                  <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
                     <Link href="/produits" className="transition-colors hover:text-accent">
                       Catalogue
                     </Link>
