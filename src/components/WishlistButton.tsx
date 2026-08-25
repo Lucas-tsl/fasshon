@@ -30,17 +30,28 @@ export function WishlistButton({
 }) {
   const [wishlisted, setWishlisted] = useState(initialWishlisted);
   const [pending, startTransition] = useTransition();
+  const [popping, setPopping] = useState(false);
 
   function handleClick(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
     const next = !wishlisted;
     setWishlisted(next);
+    setPopping(true);
     startTransition(async () => {
       const result = await toggleWishlist(productId);
       setWishlisted(result.wishlisted);
     });
   }
+
+  const heart = (
+    <span
+      className={`inline-flex ${popping ? "heart-pop" : ""}`}
+      onAnimationEnd={() => setPopping(false)}
+    >
+      <HeartIcon filled={wishlisted} />
+    </span>
+  );
 
   if (compact) {
     return (
@@ -54,7 +65,7 @@ export function WishlistButton({
           wishlisted ? "text-accent" : "text-foreground/60 hover:text-accent"
         }`}
       >
-        <HeartIcon filled={wishlisted} />
+        {heart}
       </button>
     );
   }
@@ -71,7 +82,7 @@ export function WishlistButton({
           : "border-border text-foreground/70 hover:border-accent hover:text-accent"
       }`}
     >
-      <HeartIcon filled={wishlisted} />
+      {heart}
       {wishlisted ? "Dans ma liste" : "Ajouter à ma liste"}
     </button>
   );

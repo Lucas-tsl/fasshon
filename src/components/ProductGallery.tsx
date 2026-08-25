@@ -7,6 +7,7 @@ import { formatPrice } from "@/lib/format";
 import { ProductImage } from "./ProductImage";
 import { WishlistButton } from "./WishlistButton";
 import { StarRating } from "./StarRating";
+import { ImageLightbox } from "./ImageLightbox";
 
 type Variant = {
   id: string;
@@ -98,6 +99,7 @@ export function ProductGallery({
   }, [selectedVariantId]);
 
   const displayImage = selectedImage ?? gallery[0] ?? null;
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const ctaRef = useRef<HTMLDivElement>(null);
   const [showSticky, setShowSticky] = useState(false);
@@ -135,13 +137,39 @@ export function ProductGallery({
   return (
     <div className="flex flex-col gap-8 md:flex-row">
       <div className="flex w-full flex-col gap-2 md:w-1/2">
-        <ProductImage
-          images={displayImage ? [displayImage] : []}
-          name={product.name}
-          categorySlug={product.categorySlug}
-          className="aspect-square w-full"
-          sizes="(min-width: 768px) 50vw, 100vw"
+        <button
+          type="button"
+          onClick={() => displayImage && setLightboxOpen(true)}
+          disabled={!displayImage}
+          className="group/zoom relative cursor-zoom-in disabled:cursor-default"
+          aria-label="Agrandir l'image"
+        >
+          <ProductImage
+            images={displayImage ? [displayImage] : []}
+            name={product.name}
+            categorySlug={product.categorySlug}
+            className="aspect-square w-full"
+            sizes="(min-width: 768px) 50vw, 100vw"
+          />
+          {displayImage ? (
+            <span className="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-background/90 text-foreground/70 opacity-0 shadow-md transition-opacity group-hover/zoom:opacity-100">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                <circle cx="10.5" cy="10.5" r="6.5" />
+                <path d="M20 20l-4.3-4.3" strokeLinecap="round" />
+                <path d="M10.5 8v5M8 10.5h5" strokeLinecap="round" />
+              </svg>
+            </span>
+          ) : null}
+        </button>
+
+        <ImageLightbox
+          images={gallery}
+          alt={product.name}
+          initialIndex={Math.max(0, gallery.indexOf(displayImage ?? ""))}
+          open={lightboxOpen}
+          onClose={() => setLightboxOpen(false)}
         />
+
         {gallery.length > 1 ? (
           <div className="flex gap-2 overflow-x-auto">
             {gallery.map((img, i) => (
