@@ -1,7 +1,8 @@
 const PALETTES: Record<string, [string, string]> = {
-  bougies: ["#f5d0a9", "#c98a4b"],
-  brumes: ["#cfe8f3", "#6fa9c9"],
-  coffrets: ["#f0d9e8", "#c07aa8"],
+  maquillage: ["#f0d9c8", "#c9834b"],
+  soins: ["#e3ecdd", "#8ba672"],
+  "bien-etre": ["#e6e1d8", "#a99a7d"],
+  senteurs: ["#f5d0a9", "#c98a4b"],
 };
 
 const DEFAULT_PALETTE: [string, string] = ["#e5e5e5", "#a3a3a3"];

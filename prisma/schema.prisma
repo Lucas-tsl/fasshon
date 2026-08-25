@@ -12,6 +12,15 @@ datasource db {
   provider = "sqlite"
 }
 
+model Brand {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  description String?
+  websiteUrl  String?
+  products    Product[]
+}
+
 model Category {
   id          String    @id @default(cuid())
   slug        String    @unique
@@ -21,18 +30,50 @@ model Category {
 }
 
 model Product {
-  id             String   @id @default(cuid())
-  slug           String   @unique
+  id             String      @id @default(cuid())
+  slug           String      @unique
   name           String
   description    String
   priceCents     Int
   compareAtCents Int?
   images         String // JSON-encoded array of image paths
-  sku            String   @unique
-  stock          Int      @default(0)
-  active         Boolean  @default(true)
-  category       Category @relation(fields: [categoryId], references: [id])
+  sku            String      @unique
+  stock          Int         @default(0)
+  active         Boolean     @default(true)
+  category       Category    @relation(fields: [categoryId], references: [id])
   categoryId     String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  brand          Brand       @relation(fields: [brandId], references: [id])
+  brandId        String
+  orderItems     OrderItem[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FULFILLED
+  CANCELED
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  stripeSessionId String      @unique
+  email           String
+  status          OrderStatus @default(PENDING)
+  totalCents      Int
+  items           OrderItem[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model OrderItem {
+  id         String  @id @default(cuid())
+  order      Order   @relation(fields: [orderId], references: [id])
+  orderId    String
+  product    Product @relation(fields: [productId], references: [id])
+  productId  String
+  nameSnap   String
+  priceCents Int
+  quantity   Int
 }
