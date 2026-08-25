@@ -44,6 +44,15 @@ const RULES: Rule[] = [
   },
 ];
 
+export function slugifyType(type: string): string {
+  return type
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
 export function inferProductType(name: string): string {
   const lower = name.toLowerCase();
   for (const rule of RULES) {

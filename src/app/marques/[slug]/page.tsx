@@ -6,6 +6,8 @@ import { BrandLogo } from "@/components/BrandLogo";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { getWishlistedProductIds } from "@/lib/wishlist";
 import { BrandSocialLinks } from "@/components/BrandSocialLinks";
+import { TypeQuickNav } from "@/components/TypeQuickNav";
+import { slugifyType } from "@/lib/product-type";
 
 export default async function MarquePage({
   params,
@@ -30,8 +32,10 @@ export default async function MarquePage({
 
   if (!brand) notFound();
 
+  const groups = groupByType(brand.products.map(toCardProduct));
+
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-10">
+    <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-10 pb-28">
       <div className="flex flex-col gap-4">
         <Breadcrumb items={[{ label: "Marques", href: "/marques" }, { label: brand.name }]} />
         <BrandLogo name={brand.name} logoPath={brand.logoPath} className="h-10" />
@@ -51,8 +55,8 @@ export default async function MarquePage({
         </p>
       ) : (
         <div className="flex flex-col gap-10">
-          {groupByType(brand.products.map(toCardProduct)).map((group) => (
-            <section key={group.type} className="flex flex-col gap-4">
+          {groups.map((group) => (
+            <section key={group.type} id={`type-${slugifyType(group.type)}`} className="flex scroll-mt-24 flex-col gap-4">
               <h2 className="text-sm font-medium uppercase tracking-wide text-foreground/50">
                 {group.type}
               </h2>
@@ -69,6 +73,8 @@ export default async function MarquePage({
           ))}
         </div>
       )}
+
+      <TypeQuickNav types={groups.map((g) => g.type)} />
     </div>
   );
 }

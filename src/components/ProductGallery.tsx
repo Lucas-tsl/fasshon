@@ -183,7 +183,7 @@ export function ProductGallery({
             type="button"
             disabled={outOfStock}
             onClick={handleAddToCart}
-            className="btn-primary w-fit"
+            className={`btn-primary w-fit ${added ? "is-added" : ""}`}
           >
             {outOfStock ? "Rupture de stock" : added ? "Ajouté ✓" : "Ajouter au panier"}
           </button>
@@ -237,9 +237,13 @@ export function ProductGallery({
             type="button"
             disabled={outOfStock}
             onClick={handleAddToCart}
-            className="btn-primary shrink-0 whitespace-nowrap"
+            className={`btn-primary shrink-0 whitespace-nowrap ${added ? "is-added" : ""}`}
           >
-            {outOfStock ? "Rupture de stock" : `Ajouter au panier — ${formatPrice(price)}`}
+            {outOfStock
+              ? "Rupture de stock"
+              : added
+                ? "Ajouté ✓"
+                : `Ajouter au panier — ${formatPrice(price)}`}
           </button>
         </div>
       </div>
