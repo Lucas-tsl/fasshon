@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCart } from "@/lib/cart-context";
 import { formatPrice } from "@/lib/format";
 import { ProductImage } from "./ProductImage";
@@ -13,6 +13,38 @@ type Variant = {
   stock: number;
   image: string | null;
 };
+
+function QuantityCounter({
+  quantity,
+  onChange,
+  max,
+}: {
+  quantity: number;
+  onChange: (next: number) => void;
+  max: number;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        type="button"
+        onClick={() => onChange(Math.max(1, quantity - 1))}
+        className="flex h-8 w-8 items-center justify-center rounded-full border border-border transition hover:border-foreground"
+        aria-label="Diminuer la quantité"
+      >
+        −
+      </button>
+      <span className="w-5 text-center text-sm">{quantity}</span>
+      <button
+        type="button"
+        onClick={() => onChange(Math.min(max, quantity + 1))}
+        className="flex h-8 w-8 items-center justify-center rounded-full border border-border transition hover:border-foreground"
+        aria-label="Augmenter la quantité"
+      >
+        +
+      </button>
+    </div>
+  );
+}
 
 export function ProductGallery({
   product,
@@ -32,6 +64,7 @@ export function ProductGallery({
 }) {
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
+  const [quantity, setQuantity] = useState(1);
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(
     variants[0]?.id ?? null,
   );
@@ -42,7 +75,8 @@ export function ProductGallery({
     : null;
 
   const price = selectedVariant ? selectedVariant.priceCents : product.priceCents;
-  const outOfStock = selectedVariant ? selectedVariant.stock <= 0 : product.stock <= 0;
+  const stock = selectedVariant ? selectedVariant.stock : product.stock;
+  const outOfStock = stock <= 0;
 
   const gallery = Array.from(
     new Set([selectedVariant?.image, ...product.images].filter((img): img is string => !!img)),
@@ -56,6 +90,39 @@ export function ProductGallery({
   }, [selectedVariantId]);
 
   const displayImage = selectedImage ?? gallery[0] ?? null;
+
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const [showSticky, setShowSticky] = useState(false);
+
+  useEffect(() => {
+    const el = ctaRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowSticky(!entry.isIntersecting),
+      { threshold: 0 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  function handleAddToCart() {
+    addItem(
+      {
+        productId: product.id,
+        variantId: selectedVariant?.id ?? null,
+        variantName: selectedVariant?.name ?? null,
+        slug: product.slug,
+        name: product.name,
+        priceCents: price,
+        brandName: product.brandName,
+        categorySlug: product.categorySlug,
+        image: displayImage,
+      },
+      quantity,
+    );
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
+  }
 
   return (
     <div className="flex flex-col gap-8 md:flex-row">
@@ -110,30 +177,70 @@ export function ProductGallery({
 
         <span className="font-display text-3xl">{formatPrice(price)}</span>
 
-        <div className="flex items-center gap-3">
+        <div ref={ctaRef} className="flex flex-wrap items-center gap-3">
+          <QuantityCounter quantity={quantity} onChange={setQuantity} max={Math.min(stock, 20)} />
           <button
             type="button"
             disabled={outOfStock}
-            onClick={() => {
-              addItem({
-                productId: product.id,
-                variantId: selectedVariant?.id ?? null,
-                variantName: selectedVariant?.name ?? null,
-                slug: product.slug,
-                name: product.name,
-                priceCents: price,
-                brandName: product.brandName,
-                categorySlug: product.categorySlug,
-                image: displayImage,
-              });
-              setAdded(true);
-              setTimeout(() => setAdded(false), 1500);
-            }}
+            onClick={handleAddToCart}
             className="btn-primary w-fit"
           >
             {outOfStock ? "Rupture de stock" : added ? "Ajouté ✓" : "Ajouter au panier"}
           </button>
           <WishlistButton productId={product.id} />
+        </div>
+      </div>
+
+      <div
+        className={`fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur-sm transition-transform duration-300 ${
+          showSticky ? "translate-y-0" : "translate-y-full"
+        }`}
+      >
+        <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-3">
+          <div className="h-12 w-12 shrink-0">
+            <ProductImage
+              images={displayImage ? [displayImage] : []}
+              name={product.name}
+              categorySlug={product.categorySlug}
+              className="h-12 w-12"
+              sizes="48px"
+            />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[11px] font-semibold tracking-wide text-foreground/50 uppercase">
+              {product.brandName}
+            </p>
+            <p className="truncate text-sm font-medium">{product.name}</p>
+          </div>
+
+          {hasVariants ? (
+            <select
+              value={selectedVariant?.id ?? ""}
+              onChange={(e) => setSelectedVariantId(e.target.value)}
+              className="hidden shrink-0 rounded-md border border-border bg-background px-2 py-1.5 text-sm sm:block"
+            >
+              {variants.map((variant) => (
+                <option key={variant.id} value={variant.id} disabled={variant.stock <= 0}>
+                  {variant.name}
+                  {variant.stock <= 0 ? " (épuisé)" : ""}
+                </option>
+              ))}
+            </select>
+          ) : null}
+
+          <div className="hidden shrink-0 sm:block">
+            <QuantityCounter quantity={quantity} onChange={setQuantity} max={Math.min(stock, 20)} />
+          </div>
+
+          <button
+            type="button"
+            disabled={outOfStock}
+            onClick={handleAddToCart}
+            className="btn-primary shrink-0 whitespace-nowrap"
+          >
+            {outOfStock ? "Rupture de stock" : `Ajouter au panier — ${formatPrice(price)}`}
+          </button>
         </div>
       </div>
     </div>

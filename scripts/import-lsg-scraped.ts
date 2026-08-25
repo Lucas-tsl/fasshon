@@ -91,6 +91,13 @@ async function main() {
     }
 
     if (entry.isVariable && entry.variants && entry.parentSku) {
+      // Contenance croissante (15 ml, 30 ml, 100 ml...) — l'ordre du JSON
+      // scrapé ne le garantit pas.
+      entry.variants.sort((a, b) => {
+        const sizeA = Number.parseFloat(a.label.match(/[\d,.]+/)?.[0]?.replace(",", ".") ?? "");
+        const sizeB = Number.parseFloat(b.label.match(/[\d,.]+/)?.[0]?.replace(",", ".") ?? "");
+        return (Number.isFinite(sizeA) ? sizeA : Infinity) - (Number.isFinite(sizeB) ? sizeB : Infinity);
+      });
       const priceCents = Math.min(...entry.variants.map((v) => v.priceCents));
       const stock = entry.variants.reduce((sum, v) => sum + v.stock, 0);
 

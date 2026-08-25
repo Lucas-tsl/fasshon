@@ -1,10 +1,10 @@
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ProductCard } from "@/components/ProductCard";
 import { toCardProduct, groupByType } from "@/lib/product-display";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { PRODUCT_TYPE_ORDER } from "@/lib/product-type";
 import { getWishlistedProductIds } from "@/lib/wishlist";
+import { CatalogueFilters } from "@/components/CatalogueFilters";
 
 export const metadata = {
   title: "Catalogue",
@@ -38,73 +38,19 @@ export default async function ProduitsPage({
   );
   const products = type ? cardProducts.filter((p) => p.productType === type) : cardProducts;
 
-  const buildHref = (next: { categorie?: string; marque?: string; type?: string }) => {
-    const params = new URLSearchParams();
-    if (next.categorie) params.set("categorie", next.categorie);
-    if (next.marque) params.set("marque", next.marque);
-    if (next.type) params.set("type", next.type);
-    const qs = params.toString();
-    return qs ? `/produits?${qs}` : "/produits";
-  };
-
-  const pill = (active: boolean) =>
-    `rounded-full border px-3 py-1 text-sm transition-colors ${
-      active ? "border-accent bg-accent text-accent-foreground" : "border-border hover:border-accent"
-    }`;
-
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10">
       <Breadcrumb items={[{ label: "Catalogue" }]} />
       <h1 className="font-display text-3xl">Catalogue</h1>
 
-      <div className="flex flex-col gap-2">
-        <nav className="flex flex-wrap gap-2">
-          <Link href={buildHref({ marque, type })} className={pill(!categorie)}>
-            Toutes les catégories
-          </Link>
-          {categories.map((category) => (
-            <Link
-              key={category.id}
-              href={buildHref({ categorie: category.slug, marque, type })}
-              className={pill(categorie === category.slug)}
-            >
-              {category.name}
-            </Link>
-          ))}
-        </nav>
-
-        <nav className="flex flex-wrap gap-2">
-          <Link href={buildHref({ categorie, type })} className={pill(!marque)}>
-            Toutes les marques
-          </Link>
-          {brands.map((brand) => (
-            <Link
-              key={brand.id}
-              href={buildHref({ categorie, marque: brand.slug, type })}
-              className={pill(marque === brand.slug)}
-            >
-              {brand.name}
-            </Link>
-          ))}
-        </nav>
-
-        {availableTypes.length > 1 ? (
-          <nav className="flex flex-wrap gap-2">
-            <Link href={buildHref({ categorie, marque })} className={pill(!type)}>
-              Tous les types
-            </Link>
-            {availableTypes.map((t) => (
-              <Link
-                key={t}
-                href={buildHref({ categorie, marque, type: t })}
-                className={pill(type === t)}
-              >
-                {t}
-              </Link>
-            ))}
-          </nav>
-        ) : null}
-      </div>
+      <CatalogueFilters
+        categories={categories.map((c) => ({ value: c.slug, label: c.name }))}
+        brands={brands.map((b) => ({ value: b.slug, label: b.name }))}
+        availableTypes={availableTypes.map((t) => ({ value: t, label: t }))}
+        categorie={categorie}
+        marque={marque}
+        type={type}
+      />
 
       {products.length === 0 ? (
         <p className="text-sm text-foreground/60">

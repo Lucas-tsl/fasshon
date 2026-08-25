@@ -6,6 +6,7 @@ import { useCart } from "@/lib/cart-context";
 import { formatPrice } from "@/lib/format";
 import { ProductImage } from "@/components/ProductImage";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { TrashIcon } from "@/components/TrashIcon";
 
 function CheckoutSteps({ step }: { step: 1 | 2 }) {
   return (
@@ -130,9 +131,10 @@ export default function PanierPage() {
             <button
               type="button"
               onClick={() => removeItem(item.productId, item.variantId)}
-              className="text-xs text-foreground/50 hover:text-foreground"
+              aria-label="Retirer du panier"
+              className="text-foreground/70 hover:text-foreground"
             >
-              Retirer
+              <TrashIcon />
             </button>
           </li>
         ))}
