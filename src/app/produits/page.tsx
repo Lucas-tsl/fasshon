@@ -6,7 +6,6 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import { PRODUCT_TYPE_ORDER } from "@/lib/product-type";
 import { getWishlistedProductIds } from "@/lib/wishlist";
 import { CatalogueFilters } from "@/components/CatalogueFilters";
-import { TypeQuickNav } from "@/components/TypeQuickNav";
 import { slugifyType } from "@/lib/product-type";
 
 export const metadata = {
@@ -44,7 +43,7 @@ export default async function ProduitsPage({
   const hasActiveFilter = !!(categorie || marque || type);
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10 pb-28">
+    <div className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10">
       <Breadcrumb items={[{ label: "Catalogue" }]} />
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h1 className="font-display text-3xl">Catalogue</h1>
@@ -93,8 +92,6 @@ export default async function ProduitsPage({
           ))}
         </div>
       )}
-
-      <TypeQuickNav types={groups.map((g) => g.type)} />
     </div>
   );
 }

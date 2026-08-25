@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { slugifyType } from "@/lib/product-type";
+import { slugifyType, shortTypeLabel } from "@/lib/product-type";
 
 export function TypeQuickNav({ types }: { types: string[] }) {
   const [active, setActive] = useState(types[0] ?? "");
@@ -51,7 +51,7 @@ export function TypeQuickNav({ types }: { types: string[] }) {
                 isActive ? "bg-background text-foreground" : "text-background/70 hover:text-background"
               }`}
             >
-              {type}
+              {shortTypeLabel(type)}
             </button>
           );
         })}

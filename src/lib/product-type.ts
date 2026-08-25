@@ -44,6 +44,32 @@ const RULES: Rule[] = [
   },
 ];
 
+// Libellés courts pour la barre de navigation par type (espace limité) —
+// le nom complet reste utilisé partout ailleurs (titres de section, filtres).
+const SHORT_LABELS: Record<string, string> = {
+  "Coffrets & Sets cadeaux": "Coffrets",
+  "Accessoires & Divers": "Accessoires",
+  "Brumes & Eaux parfumées": "Brumes",
+  "Vernis & Ongles": "Ongles",
+  "Mascaras & Cils": "Cils",
+  "Palettes & Maquillage yeux": "Yeux",
+  "Gommages & Exfoliants": "Gommages",
+  "Nettoyants & Démaquillants": "Nettoyants",
+  "Corps & Bain": "Corps",
+  "Aromathérapie": "Aroma",
+  "Sérums, crèmes & soins visage": "Soins visage",
+  "Compléments & Bien-être": "Compléments",
+  "Plats & Repas protéinés": "Plats",
+  "Entrées & Apéritif": "Apéritif",
+  "Desserts & Douceurs": "Desserts",
+  "Digestifs & Microbiote": "Digestifs",
+  "Minceur & Drainage": "Minceur",
+};
+
+export function shortTypeLabel(type: string): string {
+  return SHORT_LABELS[type] ?? type.split(/[&,]/)[0]!.trim();
+}
+
 export function slugifyType(type: string): string {
   return type
     .toLowerCase()
