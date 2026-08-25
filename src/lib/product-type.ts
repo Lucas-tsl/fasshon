@@ -11,6 +11,11 @@ type Rule = { type: string; keywords: string[] };
 const RULES: Rule[] = [
   { type: "Coffrets & Sets cadeaux", keywords: ["coffret", "calendrier", "cracker", "cadeau"] },
   { type: "Accessoires & Trousses", keywords: ["porte-clés", "porte-cles"] },
+  // "Brumes" doit être vérifié avant "Parfums" : une brume est aussi taguée
+  // "parfumée" dans ses catégories, le mot "parfum" seul ne doit donc pas
+  // l'emporter sur le signal plus précis "brume".
+  { type: "Brumes & Eaux parfumées", keywords: ["brume", "energisante", "énergisante", "l'eau"] },
+  { type: "Parfums", keywords: ["eau de parfum", "eaux de parfum", "parfum"] },
   { type: "Vernis & Ongles", keywords: ["vernis", "manucure", "nail"] },
   { type: "Mascaras & Cils", keywords: ["mascara", "cils", "lash"] },
   { type: "Palettes & Maquillage yeux", keywords: ["palette", "fards", "eyeliner", "liner", "eyessentials"] },
@@ -22,10 +27,9 @@ const RULES: Rule[] = [
   { type: "Solaire", keywords: ["solaire", "spf"] },
   { type: "Gommages & Exfoliants", keywords: ["gommage", "exfoliant"] },
   { type: "Nettoyants & Démaquillants", keywords: ["démaquill", "demaquill", "nettoyant", "micellaire", "lotion"] },
-  { type: "Corps & Bain", keywords: ["huile", "corps", "mains"] },
+  { type: "Corps & Bain", keywords: ["huile", "corps", "mains", "gel douche", "shampoing"] },
   { type: "Aromathérapie", keywords: ["roll-on", "aroma"] },
   { type: "Déodorants", keywords: ["déodorant", "deodorant"] },
-  { type: "Brumes & Eaux parfumées", keywords: ["brume", "energisante", "énergisante", "l'eau"] },
   { type: "Sérums, crèmes & soins visage", keywords: ["sérum", "serum", "crème", "creme", "concentré", "concentre", "fluide", "masque", "soin"] },
   { type: "Compléments & Bien-être", keywords: ["cure", "complément", "complement", "barre", "collagène", "collagene", "drainant", "protéin", "proteine"] },
   { type: "Épilation", keywords: ["dépilatoire", "depilatoire"] },
