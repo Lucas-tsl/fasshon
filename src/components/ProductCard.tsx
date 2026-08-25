@@ -2,7 +2,6 @@ import Link from "next/link";
 import { formatPrice } from "@/lib/format";
 import { ProductImage } from "./ProductImage";
 import { WishlistButton } from "./WishlistButton";
-import { StarRating } from "./StarRating";
 
 export function ProductCard({
   product,
@@ -63,9 +62,6 @@ export function ProductCard({
           {product.brandName}
         </p>
         <h3 className="text-sm font-medium">{product.name}</h3>
-        {product.reviewCount ? (
-          <StarRating value={product.averageRating ?? 0} count={product.reviewCount} />
-        ) : null}
         <div className="mt-1 flex items-center gap-2 text-sm">
           <span className="font-semibold">
             {product.hasVariants ? "Dès " : ""}

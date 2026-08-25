@@ -61,21 +61,25 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
             <AnnouncementBar />
             <header className="border-b border-border bg-background/90 px-4 py-3 backdrop-blur-sm">
               <div className="mx-auto flex max-w-6xl items-center justify-between">
-                <Link href="/" className="font-display text-2xl tracking-wide">
-                  Fasshon
-                </Link>
-                <nav className="flex items-center gap-6 text-sm font-medium">
-                  <Link href="/produits" className="transition-colors hover:text-accent">
-                    Catalogue
+                <div className="flex items-center gap-6">
+                  <Link href="/" className="font-display text-2xl tracking-wide">
+                    Fasshon
                   </Link>
-                  <BrandsMenu brands={brands} />
-                  <Link href="/blog" className="transition-colors hover:text-accent">
-                    Blog
-                  </Link>
+                  <nav className="flex items-center gap-6 text-sm font-medium">
+                    <Link href="/produits" className="transition-colors hover:text-accent">
+                      Catalogue
+                    </Link>
+                    <BrandsMenu brands={brands} />
+                    <Link href="/blog" className="transition-colors hover:text-accent">
+                      Blog
+                    </Link>
+                  </nav>
+                </div>
+                <div className="flex items-center gap-3">
                   <SearchBar />
                   <AccountIcon connected={!!user} />
                   <CartLink />
-                </nav>
+                </div>
               </div>
             </header>
           </div>
