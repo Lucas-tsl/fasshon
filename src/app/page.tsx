@@ -4,7 +4,16 @@ import { ProductCard } from "@/components/ProductCard";
 import { toCardProduct } from "@/lib/product-display";
 import { BrandLogo } from "@/components/BrandLogo";
 import { Carousel, CarouselItem } from "@/components/Carousel";
+import { BrandShowcaseBanner } from "@/components/BrandShowcaseBanner";
+import { parseImages } from "@/lib/product-display";
 import { PRODUCT_TYPE_ORDER } from "@/lib/product-type";
+
+const SHOWCASE_TYPE_BY_BRAND: Record<string, string> = {
+  "jozz-beauty": "Palettes & Maquillage yeux",
+  "les-senteurs-gourmandes": "Parfums",
+  "pur-eden": "Sérums, crèmes & soins visage",
+  physiomins: "Compléments & Bien-être",
+};
 
 const TYPE_EMOJI: Record<string, string> = {
   Parfums: "🌸",
@@ -49,6 +58,30 @@ export default async function Home() {
     .sort((a, b) => a.order - b.order)
     .map((x) => x.product);
 
+  const showcasePicks = await Promise.all(
+    brands.map(async (brand) => {
+      const preferredType = SHOWCASE_TYPE_BY_BRAND[brand.slug];
+      const product =
+        (preferredType &&
+          (await prisma.product.findFirst({
+            where: { brandId: brand.id, productType: preferredType, active: true, NOT: { images: "[]" } },
+            orderBy: { priceCents: "desc" },
+          }))) ||
+        (await prisma.product.findFirst({
+          where: { brandId: brand.id, active: true, NOT: { images: "[]" } },
+          orderBy: { priceCents: "desc" },
+        }));
+      if (!product) return null;
+      return {
+        brandSlug: brand.slug,
+        brandName: brand.name,
+        image: parseImages(product.images)[0]!,
+        productName: product.name,
+      };
+    }),
+  );
+  const showcaseTiles = showcasePicks.filter((t): t is NonNullable<typeof t> => t !== null);
+
   const topTypes = typeCounts
     .filter((t) => t.productType)
     .sort((a, b) => {
@@ -83,6 +116,8 @@ export default async function Home() {
           </Link>
         </div>
       </section>
+
+      <BrandShowcaseBanner tiles={showcaseTiles} />
 
       <section className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-12">
         <h2 className="font-display text-2xl">Parcourir par catégorie</h2>
