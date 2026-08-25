@@ -13,7 +13,8 @@ import { inferProductType } from "../src/lib/product-type";
 // Importe TOUS les produits publiés (post_status = "Publié"), y compris
 // ceux en rupture de stock ou marqués fin de collection — seuls les
 // brouillons/produits privés (jamais mis en ligne) sont exclus. Télécharge
-// la première image de chaque produit dans public/products/<brandSlug>/.
+// toutes les images de chaque produit (galerie WooCommerce complète) dans
+// public/products/<brandSlug>/.
 
 type WooRow = Record<string, string>;
 
@@ -34,9 +35,11 @@ function parsePriceCents(value: string): number | null {
   return Number.isFinite(n) ? Math.round(n * 100) : null;
 }
 
-function firstImageUrl(images: string): string | null {
-  const first = images.split("|")[0]?.split(" ! ")[0]?.trim();
-  return first || null;
+function allImageUrls(images: string): string[] {
+  return images
+    .split("|")
+    .map((entry) => entry.split(" ! ")[0]?.trim())
+    .filter((url): url is string => !!url);
 }
 
 async function downloadImage(url: string, destDir: string, baseName: string): Promise<string | null> {
@@ -102,11 +105,11 @@ async function main() {
 
     const stock = Number.parseInt(row.stock || "0", 10) || 0;
 
-    let images: string[] = [];
-    const imageUrl = firstImageUrl(row.images ?? "");
-    if (imageUrl) {
-      const fileName = await downloadImage(imageUrl, publicDir, slug);
-      if (fileName) images = [`/products/${brandSlug}/${fileName}`];
+    const images: string[] = [];
+    const imageUrls = allImageUrls(row.images ?? "");
+    for (const [i, imageUrl] of imageUrls.entries()) {
+      const fileName = await downloadImage(imageUrl, publicDir, i === 0 ? slug : `${slug}-${i + 1}`);
+      if (fileName) images.push(`/products/${brandSlug}/${fileName}`);
     }
 
     await prisma.product.upsert({

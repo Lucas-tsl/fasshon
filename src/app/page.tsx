@@ -7,6 +7,7 @@ import { Carousel, CarouselItem } from "@/components/Carousel";
 import { BrandShowcaseBanner } from "@/components/BrandShowcaseBanner";
 import { parseImages } from "@/lib/product-display";
 import { PRODUCT_TYPE_ORDER } from "@/lib/product-type";
+import { getWishlistedProductIds } from "@/lib/wishlist";
 
 const SHOWCASE_TYPE_BY_BRAND: Record<string, string> = {
   "jozz-beauty": "Palettes & Maquillage yeux",
@@ -30,13 +31,14 @@ const TYPE_EMOJI: Record<string, string> = {
 };
 
 export default async function Home() {
-  const [brands, typeCounts] = await Promise.all([
+  const [brands, typeCounts, wishlistedIds] = await Promise.all([
     prisma.brand.findMany({ orderBy: { name: "asc" } }),
     prisma.product.groupBy({
       by: ["productType"],
       where: { active: true, productType: { not: null } },
       _count: true,
     }),
+    getWishlistedProductIds(),
   ]);
 
   // Autant de produits que possible par marque plutôt qu'un simple "plus
@@ -166,7 +168,7 @@ export default async function Home() {
         <Carousel>
           {products.map((product) => (
             <CarouselItem key={product.id}>
-              <ProductCard product={toCardProduct(product)} />
+              <ProductCard product={toCardProduct(product)} wishlisted={wishlistedIds.has(product.id)} />
             </CarouselItem>
           ))}
         </Carousel>

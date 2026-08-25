@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCart } from "@/lib/cart-context";
 import { formatPrice } from "@/lib/format";
 import { ProductImage } from "./ProductImage";
+import { WishlistButton } from "./WishlistButton";
 
 type Variant = {
   id: string;
@@ -25,7 +26,7 @@ export function ProductGallery({
     stock: number;
     brandName: string;
     categorySlug: string;
-    image: string | null;
+    images: string[];
   };
   variants: Variant[];
 }) {
@@ -42,17 +43,48 @@ export function ProductGallery({
 
   const price = selectedVariant ? selectedVariant.priceCents : product.priceCents;
   const outOfStock = selectedVariant ? selectedVariant.stock <= 0 : product.stock <= 0;
-  const displayImage = selectedVariant?.image ?? product.image;
+
+  const gallery = Array.from(
+    new Set([selectedVariant?.image, ...product.images].filter((img): img is string => !!img)),
+  );
+  const [selectedImage, setSelectedImage] = useState<string | null>(gallery[0] ?? null);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- resynchronise l'image affichée sur la variante choisie, sans quoi le clic sur une vignette serait écrasé au prochain rendu
+    if (selectedVariant?.image) setSelectedImage(selectedVariant.image);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- volontaire : ne réagit qu'au changement de variante, pas aux clics sur les vignettes
+  }, [selectedVariantId]);
+
+  const displayImage = selectedImage ?? gallery[0] ?? null;
 
   return (
     <div className="flex flex-col gap-8 md:flex-row">
-      <ProductImage
-        images={displayImage ? [displayImage] : []}
-        name={product.name}
-        categorySlug={product.categorySlug}
-        className="aspect-square w-full md:w-1/2"
-        sizes="(min-width: 768px) 50vw, 100vw"
-      />
+      <div className="flex w-full flex-col gap-2 md:w-1/2">
+        <ProductImage
+          images={displayImage ? [displayImage] : []}
+          name={product.name}
+          categorySlug={product.categorySlug}
+          className="aspect-square w-full"
+          sizes="(min-width: 768px) 50vw, 100vw"
+        />
+        {gallery.length > 1 ? (
+          <div className="flex gap-2 overflow-x-auto">
+            {gallery.map((img, i) => (
+              <button
+                key={img}
+                type="button"
+                onClick={() => setSelectedImage(img)}
+                className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-md border bg-muted transition ${
+                  displayImage === img ? "border-foreground" : "border-border hover:border-foreground/50"
+                }`}
+                aria-label={`Voir l'image ${i + 1}`}
+              >
+                <ProductImage images={[img]} name={product.name} categorySlug={product.categorySlug} className="h-full w-full" sizes="64px" />
+              </button>
+            ))}
+          </div>
+        ) : null}
+      </div>
 
       <div className="flex flex-1 flex-col gap-3">
         {hasVariants ? (
@@ -78,28 +110,31 @@ export function ProductGallery({
 
         <span className="font-display text-3xl">{formatPrice(price)}</span>
 
-        <button
-          type="button"
-          disabled={outOfStock}
-          onClick={() => {
-            addItem({
-              productId: product.id,
-              variantId: selectedVariant?.id ?? null,
-              variantName: selectedVariant?.name ?? null,
-              slug: product.slug,
-              name: product.name,
-              priceCents: price,
-              brandName: product.brandName,
-              categorySlug: product.categorySlug,
-              image: displayImage,
-            });
-            setAdded(true);
-            setTimeout(() => setAdded(false), 1500);
-          }}
-          className="btn-primary w-fit"
-        >
-          {outOfStock ? "Rupture de stock" : added ? "Ajouté ✓" : "Ajouter au panier"}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            disabled={outOfStock}
+            onClick={() => {
+              addItem({
+                productId: product.id,
+                variantId: selectedVariant?.id ?? null,
+                variantName: selectedVariant?.name ?? null,
+                slug: product.slug,
+                name: product.name,
+                priceCents: price,
+                brandName: product.brandName,
+                categorySlug: product.categorySlug,
+                image: displayImage,
+              });
+              setAdded(true);
+              setTimeout(() => setAdded(false), 1500);
+            }}
+            className="btn-primary w-fit"
+          >
+            {outOfStock ? "Rupture de stock" : added ? "Ajouté ✓" : "Ajouter au panier"}
+          </button>
+          <WishlistButton productId={product.id} />
+        </div>
       </div>
     </div>
   );

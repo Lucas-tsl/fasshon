@@ -4,6 +4,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { toCardProduct, groupByType } from "@/lib/product-display";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { PRODUCT_TYPE_ORDER } from "@/lib/product-type";
+import { getWishlistedProductIds } from "@/lib/wishlist";
 
 export const metadata = {
   title: "Catalogue",
@@ -16,7 +17,7 @@ export default async function ProduitsPage({
 }) {
   const { categorie, marque, type } = await searchParams;
 
-  const [categories, brands, matchingProducts] = await Promise.all([
+  const [categories, brands, matchingProducts, wishlistedIds] = await Promise.all([
     prisma.category.findMany({ orderBy: { name: "asc" } }),
     prisma.brand.findMany({ orderBy: { name: "asc" } }),
     prisma.product.findMany({
@@ -28,6 +29,7 @@ export default async function ProduitsPage({
       include: { category: true, brand: true, variants: { where: { active: true } } },
       orderBy: { createdAt: "desc" },
     }),
+    getWishlistedProductIds(),
   ]);
 
   const cardProducts = matchingProducts.map(toCardProduct);
@@ -117,7 +119,11 @@ export default async function ProduitsPage({
               </h2>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
                 {group.products.map((product) => (
-                  <ProductCard key={product.slug} product={product} />
+                  <ProductCard
+                    key={product.slug}
+                    product={product}
+                    wishlisted={wishlistedIds.has(product.id)}
+                  />
                 ))}
               </div>
             </section>

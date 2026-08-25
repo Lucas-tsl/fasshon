@@ -47,6 +47,13 @@ export default async function ComptePage() {
         </form>
       </div>
 
+      <Link
+        href="/compte/liste-de-souhaits"
+        className="w-fit rounded-md border border-border px-4 py-2 text-sm font-medium transition-colors hover:border-foreground"
+      >
+        ♥ Ma liste de souhaits
+      </Link>
+
       <div className="flex flex-col gap-3">
         <h2 className="text-xs font-semibold tracking-widest text-foreground/50 uppercase">
           Mes commandes

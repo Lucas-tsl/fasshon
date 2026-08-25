@@ -45,7 +45,7 @@ export default async function ProductPage({
           stock: product.stock,
           brandName: product.brand.name,
           categorySlug: product.category.slug,
-          image: parseImages(product.images)[0] ?? null,
+          images: parseImages(product.images),
         }}
         variants={product.variants.map((v) => ({
           id: v.id,

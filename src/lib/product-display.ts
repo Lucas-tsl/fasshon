@@ -1,12 +1,17 @@
 import { PRODUCT_TYPE_ORDER } from "./product-type";
 
+const NEW_WINDOW_DAYS = 30;
+
 type ProductForCard = {
+  id: string;
   slug: string;
   name: string;
   priceCents: number;
   compareAtCents: number | null;
   images: string;
   productType: string | null;
+  bestSeller: boolean;
+  createdAt: Date;
   category: { slug: string };
   brand: { name: string };
   variants: { priceCents: number }[];
@@ -30,6 +35,7 @@ export function toCardProduct(product: ProductForCard) {
     : product.priceCents;
 
   return {
+    id: product.id,
     slug: product.slug,
     name: product.name,
     priceCents,
@@ -39,6 +45,8 @@ export function toCardProduct(product: ProductForCard) {
     hasVariants,
     images: parseImages(product.images),
     productType: product.productType ?? "Autres",
+    bestSeller: product.bestSeller,
+    isNew: Date.now() - product.createdAt.getTime() < NEW_WINDOW_DAYS * 24 * 60 * 60 * 1000,
   };
 }
 

@@ -28,6 +28,7 @@ export default async function AdminProduitsPage() {
                   <th className="py-2 pr-3">Prix (€)</th>
                   <th className="py-2 pr-3">Stock</th>
                   <th className="py-2 pr-3">Actif</th>
+                  <th className="py-2 pr-3">Best-seller</th>
                   <th className="py-2" />
                 </tr>
               </thead>
@@ -68,6 +69,14 @@ export default async function AdminProduitsPage() {
                         type="checkbox"
                         name="active"
                         defaultChecked={product.active}
+                      />
+                    </td>
+                    <td className="py-2 pr-3">
+                      <input
+                        form={`product-${product.id}`}
+                        type="checkbox"
+                        name="bestSeller"
+                        defaultChecked={product.bestSeller}
                       />
                     </td>
                     <td className="py-2">

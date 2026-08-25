@@ -13,13 +13,16 @@ datasource db {
 }
 
 model Brand {
-  id          String    @id @default(cuid())
-  slug        String    @unique
-  name        String
-  description String?
-  websiteUrl  String?
-  logoPath    String? // chemin local vers le logo officiel (public/brands/...)
-  products    Product[]
+  id           String    @id @default(cuid())
+  slug         String    @unique
+  name         String
+  description  String?
+  websiteUrl   String?
+  logoPath     String? // chemin local vers le logo officiel (public/brands/...)
+  youtubeUrl   String?
+  tiktokUrl    String?
+  instagramUrl String?
+  products     Product[]
 }
 
 model Category {
@@ -31,25 +34,27 @@ model Category {
 }
 
 model Product {
-  id             String      @id @default(cuid())
-  slug           String      @unique
+  id             String           @id @default(cuid())
+  slug           String           @unique
   name           String
   description    String
   priceCents     Int
   compareAtCents Int?
   images         String // JSON-encoded array of image paths
   productType    String? // type affiché pour regrouper le catalogue (ex: "Palettes", "Coffrets") — dérivé du nom au moment de l'import
-  sku            String      @unique
-  stock          Int         @default(0)
-  active         Boolean     @default(true)
-  category       Category    @relation(fields: [categoryId], references: [id])
+  sku            String           @unique
+  stock          Int              @default(0)
+  active         Boolean          @default(true)
+  bestSeller     Boolean          @default(false)
+  wishedBy       WishlistItem[]
+  category       Category         @relation(fields: [categoryId], references: [id])
   categoryId     String
-  brand          Brand       @relation(fields: [brandId], references: [id])
+  brand          Brand            @relation(fields: [brandId], references: [id])
   brandId        String
   variants       ProductVariant[]
   orderItems     OrderItem[]
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
 }
 
 // Déclinaisons optionnelles d'un produit (taille, teinte, contenance...).
@@ -76,12 +81,24 @@ model NewsletterSubscriber {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String         @id @default(cuid())
+  email        String         @unique
   passwordHash String
   name         String?
-  createdAt    DateTime @default(now())
+  createdAt    DateTime       @default(now())
   orders       Order[]
+  wishlist     WishlistItem[]
+}
+
+model WishlistItem {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
 }
 
 enum OrderStatus {
@@ -105,15 +122,15 @@ model Order {
 }
 
 model OrderItem {
-  id            String          @id @default(cuid())
-  order         Order           @relation(fields: [orderId], references: [id])
-  orderId       String
-  product       Product         @relation(fields: [productId], references: [id])
-  productId     String
-  variant       ProductVariant? @relation(fields: [variantId], references: [id])
-  variantId     String?
-  nameSnap      String
+  id              String          @id @default(cuid())
+  order           Order           @relation(fields: [orderId], references: [id])
+  orderId         String
+  product         Product         @relation(fields: [productId], references: [id])
+  productId       String
+  variant         ProductVariant? @relation(fields: [variantId], references: [id])
+  variantId       String?
+  nameSnap        String
   variantNameSnap String?
-  priceCents    Int
-  quantity      Int
+  priceCents      Int
+  quantity        Int
 }

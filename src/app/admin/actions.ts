@@ -36,6 +36,7 @@ export async function updateProduct(formData: FormData) {
   const priceCents = Math.round(Number(formData.get("price")) * 100);
   const stock = Number(formData.get("stock"));
   const active = formData.get("active") === "on";
+  const bestSeller = formData.get("bestSeller") === "on";
 
   if (
     !id ||
@@ -47,7 +48,7 @@ export async function updateProduct(formData: FormData) {
     throw new Error("Champs invalides.");
   }
 
-  await prisma.product.update({ where: { id }, data: { priceCents, stock, active } });
+  await prisma.product.update({ where: { id }, data: { priceCents, stock, active, bestSeller } });
   revalidatePath("/admin/produits");
 }
 

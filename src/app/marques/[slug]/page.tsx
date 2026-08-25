@@ -4,6 +4,8 @@ import { ProductCard } from "@/components/ProductCard";
 import { toCardProduct, groupByType } from "@/lib/product-display";
 import { BrandLogo } from "@/components/BrandLogo";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { getWishlistedProductIds } from "@/lib/wishlist";
+import { BrandSocialLinks } from "@/components/BrandSocialLinks";
 
 export default async function MarquePage({
   params,
@@ -12,16 +14,19 @@ export default async function MarquePage({
 }) {
   const { slug } = await params;
 
-  const brand = await prisma.brand.findUnique({
-    where: { slug },
-    include: {
-      products: {
-        where: { active: true },
-        include: { category: true, brand: true, variants: { where: { active: true } } },
-        orderBy: { createdAt: "desc" },
+  const [brand, wishlistedIds] = await Promise.all([
+    prisma.brand.findUnique({
+      where: { slug },
+      include: {
+        products: {
+          where: { active: true },
+          include: { category: true, brand: true, variants: { where: { active: true } } },
+          orderBy: { createdAt: "desc" },
+        },
       },
-    },
-  });
+    }),
+    getWishlistedProductIds(),
+  ]);
 
   if (!brand) notFound();
 
@@ -33,6 +38,11 @@ export default async function MarquePage({
         {brand.description ? (
           <p className="max-w-xl text-sm text-foreground/60">{brand.description}</p>
         ) : null}
+        <BrandSocialLinks
+          youtubeUrl={brand.youtubeUrl}
+          tiktokUrl={brand.tiktokUrl}
+          instagramUrl={brand.instagramUrl}
+        />
       </div>
 
       {brand.products.length === 0 ? (
@@ -48,7 +58,11 @@ export default async function MarquePage({
               </h2>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
                 {group.products.map((product) => (
-                  <ProductCard key={product.slug} product={product} />
+                  <ProductCard
+                    key={product.slug}
+                    product={product}
+                    wishlisted={wishlistedIds.has(product.id)}
+                  />
                 ))}
               </div>
             </section>
