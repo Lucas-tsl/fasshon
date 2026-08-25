@@ -11,7 +11,11 @@ fi
 
 mkdir -p "$DEST"
 
-rsync -rv --no-perms --no-owner --no-group --no-times --delete --delete-excluded \
+# Pas de --delete : ce dossier est un miroir de sauvegarde à sens unique,
+# jamais un espace de dépôt de fichiers. Sans --delete, rien n'y est jamais
+# effacé automatiquement, même si on y ajoute des fichiers à la main
+# (--delete a un jour supprimé un CSV déposé ici par erreur).
+rsync -rv --no-perms --no-owner --no-group --no-times \
   --exclude 'node_modules' \
   --exclude '.next' \
   --exclude '.git' \

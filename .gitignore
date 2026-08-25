@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -51,3 +52,8 @@ next-env.d.ts
 /.claude/skills
 /.windsurf/skills
 /skills-lock.json
+
+# raw supplier/brand data exports (confidential, never committed) — drop
+# CSV exports here to import them; see scripts/import-woocommerce.ts
+/imports/*
+!/imports/.gitkeep
