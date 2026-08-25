@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ProductCard } from "@/components/ProductCard";
-import { toCardProduct } from "@/lib/product-display";
+import { toCardProduct, groupByType } from "@/lib/product-display";
 
 export const metadata = {
   title: "Catalogue",
@@ -82,9 +82,18 @@ export default async function ProduitsPage({
           Aucun produit ne correspond à ce filtre pour le moment.
         </p>
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={toCardProduct(product)} />
+        <div className="flex flex-col gap-10">
+          {groupByType(products.map(toCardProduct)).map((group) => (
+            <section key={group.type} className="flex flex-col gap-4">
+              <h2 className="text-sm font-medium uppercase tracking-wide text-foreground/50">
+                {group.type}
+              </h2>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+                {group.products.map((product) => (
+                  <ProductCard key={product.slug} product={product} />
+                ))}
+              </div>
+            </section>
           ))}
         </div>
       )}

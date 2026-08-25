@@ -37,6 +37,7 @@ model Product {
   priceCents     Int
   compareAtCents Int?
   images         String // JSON-encoded array of image paths
+  productType    String? // type affiché pour regrouper le catalogue (ex: "Palettes", "Coffrets") — dérivé du nom au moment de l'import
   sku            String      @unique
   stock          Int         @default(0)
   active         Boolean     @default(true)

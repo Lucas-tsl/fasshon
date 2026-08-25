@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { parse } from "csv-parse/sync";
 import { prisma } from "../src/lib/prisma";
+import { inferProductType } from "../src/lib/product-type";
 
 // Importeur dédié pour l'export Physiomins, format différent de
 // WooCommerce (PrestaShop, séparateur point-virgule, pas de description
@@ -97,6 +98,7 @@ async function main() {
         sku,
         stock,
         images: JSON.stringify(images),
+        productType: inferProductType(name),
         active: true,
         categoryId: category.id,
         brandId: brand.id,
@@ -110,6 +112,7 @@ async function main() {
         sku,
         stock,
         images: JSON.stringify(images),
+        productType: inferProductType(name),
         active: true,
         categoryId: category.id,
         brandId: brand.id,
