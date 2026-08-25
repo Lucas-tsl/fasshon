@@ -7,7 +7,7 @@ export default function EquipePage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-10">
       <Breadcrumb items={[{ label: "Notre équipe" }]} />
-      <h1 className="text-2xl font-semibold">Notre équipe</h1>
+      <h1 className="font-display text-3xl">Notre équipe</h1>
       <p className="text-sm leading-relaxed text-foreground/70">
         Fasshon est un concept store indépendant qui réunit une sélection de marques
         françaises pour vous faire découvrir le meilleur de la beauté, des soins

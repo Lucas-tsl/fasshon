@@ -21,13 +21,7 @@ const TYPE_EMOJI: Record<string, string> = {
 };
 
 export default async function Home() {
-  const [products, brands, typeCounts] = await Promise.all([
-    prisma.product.findMany({
-      where: { active: true },
-      include: { category: true, brand: true, variants: { where: { active: true } } },
-      orderBy: { createdAt: "desc" },
-      take: 12,
-    }),
+  const [brands, typeCounts] = await Promise.all([
     prisma.brand.findMany({ orderBy: { name: "asc" } }),
     prisma.product.groupBy({
       by: ["productType"],
@@ -35,6 +29,25 @@ export default async function Home() {
       _count: true,
     }),
   ]);
+
+  // Autant de produits que possible par marque plutôt qu'un simple "plus
+  // récents" global : sinon la marque importée en dernier (même de longue
+  // date en réalité) écrase les 3 autres dans "Nouveautés".
+  const perBrandProducts = await Promise.all(
+    brands.map((brand) =>
+      prisma.product.findMany({
+        where: { active: true, brandId: brand.id },
+        include: { category: true, brand: true, variants: { where: { active: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 3,
+      }),
+    ),
+  );
+  const products = perBrandProducts.flatMap((list, i) =>
+    list.map((product, j) => ({ product, order: j * brands.length + i })),
+  )
+    .sort((a, b) => a.order - b.order)
+    .map((x) => x.product);
 
   const topTypes = typeCounts
     .filter((t) => t.productType)
@@ -47,62 +60,56 @@ export default async function Home() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <section className="relative overflow-hidden border-b border-border px-4 py-20 text-center sm:py-28">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 -z-10"
-          style={{
-            background:
-              "radial-gradient(60% 50% at 50% 0%, color-mix(in srgb, var(--accent) 14%, transparent), transparent)",
-          }}
-        />
-        <h1 className="animate-fade-in-up text-4xl font-semibold tracking-tight sm:text-5xl">
-          Fasshon
+      <section className="relative overflow-hidden bg-surface-inverse px-4 py-24 text-center text-foreground-inverse sm:py-32">
+        <h1 className="font-display animate-fade-in-up text-6xl leading-[0.95] sm:text-8xl">
+          Beauté.
+          <br />
+          Soins.
+          <br />
+          <span className="text-accent">Bien-être.</span>
         </h1>
-        <p className="animate-fade-in-up stagger-1 mx-auto mt-4 max-w-md text-foreground/60">
-          Un concept store qui réunit une sélection de marques françaises — beauté,
-          soins naturels, bien-être et senteurs.
+        <p className="animate-fade-in-up stagger-1 mx-auto mt-6 max-w-md text-foreground-inverse/70">
+          Un concept store qui réunit une sélection de marques françaises indépendantes.
         </p>
         <div className="animate-fade-in-up stagger-2 mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link
-            href="/produits"
-            className="inline-block rounded-full bg-accent px-7 py-2.5 text-sm font-medium text-accent-foreground transition-transform duration-200 hover:scale-105 hover:opacity-90"
-          >
+          <Link href="/produits" className="btn-primary">
             Voir le catalogue
           </Link>
           <Link
             href="/marques"
-            className="inline-block rounded-full border border-border px-7 py-2.5 text-sm font-medium transition-colors hover:border-accent hover:text-accent"
+            className="inline-flex items-center justify-center gap-2 rounded-md border-[1.5px] border-foreground-inverse px-7 py-3 text-[13px] font-semibold tracking-wide text-foreground-inverse uppercase transition-colors hover:bg-foreground-inverse hover:text-surface-inverse"
           >
             Découvrir nos marques
           </Link>
         </div>
       </section>
 
-      <section className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 py-10">
-        <h2 className="text-lg font-medium">Parcourir par catégorie</h2>
+      <section className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-12">
+        <h2 className="font-display text-2xl">Parcourir par catégorie</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {topTypes.map((t, i) => (
             <Link
               key={t.productType}
               href={`/produits?type=${encodeURIComponent(t.productType!)}`}
-              className="animate-fade-in-up group flex flex-col items-center justify-center gap-2 rounded-xl border border-border px-3 py-6 text-center transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-lg hover:shadow-black/5"
+              className="animate-fade-in-up group flex flex-col items-center justify-center gap-2 rounded-md border border-border bg-muted px-3 py-8 text-center transition-all duration-300 hover:-translate-y-1 hover:bg-surface-inverse"
               style={{ animationDelay: `${i * 0.04}s` }}
             >
               <span className="text-2xl" aria-hidden="true">
                 {TYPE_EMOJI[t.productType!] ?? "🛍️"}
               </span>
-              <span className="text-sm font-medium transition-colors group-hover:text-accent">
+              <span className="text-xs font-semibold tracking-wide uppercase transition-colors group-hover:text-foreground-inverse">
                 {t.productType}
               </span>
-              <span className="text-xs text-foreground/40">{t._count} produits</span>
+              <span className="text-xs text-foreground/40 transition-colors group-hover:text-foreground-inverse/50">
+                {t._count} produits
+              </span>
             </Link>
           ))}
         </div>
       </section>
 
-      <section className="mx-auto flex w-full max-w-5xl flex-col gap-3 px-4 py-10">
-        <h2 className="text-sm font-medium uppercase tracking-wide text-foreground/50">
+      <section className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-12">
+        <h2 className="text-xs font-semibold tracking-widest text-foreground/50 uppercase">
           Nos marques
         </h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -110,7 +117,7 @@ export default async function Home() {
             <Link
               key={brand.id}
               href={`/marques/${brand.slug}`}
-              className="animate-fade-in-up group flex items-center justify-center rounded-xl border border-border p-6 transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-lg hover:shadow-black/5"
+              className="animate-fade-in-up group flex items-center justify-center rounded-md border border-border p-6 transition-all duration-300 hover:-translate-y-1 hover:border-foreground"
               style={{ animationDelay: `${i * 0.05}s` }}
             >
               <BrandLogo name={brand.name} logoPath={brand.logoPath} className="h-8" />
@@ -119,8 +126,8 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 py-10">
-        <h2 className="text-lg font-medium">Nouveautés</h2>
+      <section className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-12">
+        <h2 className="font-display text-2xl">Nouveautés</h2>
         <Carousel>
           {products.map((product) => (
             <CarouselItem key={product.id}>

@@ -13,7 +13,7 @@ export default async function MarquesPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-10">
       <div>
-        <h1 className="text-2xl font-semibold">Nos marques</h1>
+        <h1 className="font-display text-3xl">Nos marques</h1>
         <p className="mt-2 max-w-xl text-sm text-foreground/60">
           Une sélection de marques françaises indépendantes, réunies dans un seul concept
           store.

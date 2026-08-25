@@ -19,16 +19,23 @@ export function ProductCard({
   return (
     <Link
       href={`/produits/${product.slug}`}
-      className="group flex flex-col gap-3 rounded-xl border border-border p-3 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-accent hover:shadow-lg hover:shadow-black/5"
+      className="group flex flex-col gap-3 rounded-md border border-border p-3 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-foreground hover:shadow-lg hover:shadow-black/5"
     >
-      <ProductImage
-        images={product.images ?? []}
-        name={product.name}
-        categorySlug={product.categorySlug}
-        className="aspect-square w-full transition-transform duration-300 ease-out group-hover:scale-[1.03]"
-      />
+      <div className="relative">
+        <ProductImage
+          images={product.images ?? []}
+          name={product.name}
+          categorySlug={product.categorySlug}
+          className="aspect-square w-full transition-transform duration-300 ease-out group-hover:scale-[1.03]"
+        />
+        {product.compareAtCents && !product.hasVariants ? (
+          <span className="absolute top-2 left-2 rounded-sm bg-accent px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-accent-foreground uppercase">
+            Promo
+          </span>
+        ) : null}
+      </div>
       <div>
-        <p className="text-xs uppercase tracking-wide text-foreground/50">
+        <p className="text-[11px] font-semibold tracking-wide text-foreground/50 uppercase">
           {product.brandName}
         </p>
         <h3 className="text-sm font-medium">{product.name}</h3>

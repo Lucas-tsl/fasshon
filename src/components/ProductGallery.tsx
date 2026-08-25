@@ -63,10 +63,10 @@ export function ProductGallery({
                 type="button"
                 onClick={() => setSelectedVariantId(variant.id)}
                 disabled={variant.stock <= 0}
-                className={`rounded-full border px-3 py-1.5 text-sm transition disabled:cursor-not-allowed disabled:opacity-40 ${
+                className={`rounded-md border px-3 py-1.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-40 ${
                   selectedVariant?.id === variant.id
-                    ? "border-accent bg-accent text-accent-foreground"
-                    : "border-border hover:border-accent"
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-border hover:border-foreground"
                 }`}
               >
                 {variant.name}
@@ -76,7 +76,7 @@ export function ProductGallery({
           </div>
         ) : null}
 
-        <span className="text-xl font-semibold">{formatPrice(price)}</span>
+        <span className="font-display text-3xl">{formatPrice(price)}</span>
 
         <button
           type="button"
@@ -96,7 +96,7 @@ export function ProductGallery({
             setAdded(true);
             setTimeout(() => setAdded(false), 1500);
           }}
-          className="w-fit rounded-full bg-accent px-6 py-2 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+          className="btn-primary w-fit"
         >
           {outOfStock ? "Rupture de stock" : added ? "Ajouté ✓" : "Ajouter au panier"}
         </button>

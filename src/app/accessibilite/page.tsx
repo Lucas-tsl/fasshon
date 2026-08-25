@@ -7,7 +7,7 @@ export default function AccessibilitePage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-10">
       <Breadcrumb items={[{ label: "Accessibilité" }]} />
-      <h1 className="text-2xl font-semibold">Déclaration d&apos;accessibilité</h1>
+      <h1 className="font-display text-3xl">Déclaration d&apos;accessibilité</h1>
 
       <p className="rounded-lg border border-accent/30 bg-accent/5 p-4 text-sm text-foreground/70">
         Trame conforme au RGAA (Référentiel Général d&apos;Amélioration de

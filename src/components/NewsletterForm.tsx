@@ -35,12 +35,12 @@ export function NewsletterForm() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Votre email"
-        className="min-w-0 flex-1 rounded-full border border-border bg-transparent px-4 py-2 text-sm"
+        className="min-w-0 flex-1 rounded-md border border-border bg-transparent px-4 py-2 text-sm"
       />
       <button
         type="submit"
         disabled={status === "loading"}
-        className="shrink-0 rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-50"
+        className="btn-primary shrink-0 !px-5 !py-2"
       >
         {status === "loading" ? "…" : "S'inscrire"}
       </button>

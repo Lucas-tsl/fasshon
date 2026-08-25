@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Bebas_Neue } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/lib/cart-context";
 import { CartLink } from "@/components/CartLink";
@@ -17,6 +17,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const bebasNeue = Bebas_Neue({
+  variable: "--font-bebas-neue",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 // Catalogue, stock et panier changent en continu (admin, commandes) : pas
@@ -41,18 +47,18 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="fr"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${bebasNeue.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <CartProvider>
           <div className="sticky top-0 z-30">
             <AnnouncementBar />
-            <header className="border-b border-border bg-background/85 px-4 py-4 backdrop-blur-sm">
-              <div className="mx-auto flex max-w-5xl items-center justify-between">
-                <Link href="/" className="text-lg font-semibold tracking-tight">
+            <header className="border-b border-border bg-background/90 px-4 py-3 backdrop-blur-sm">
+              <div className="mx-auto flex max-w-6xl items-center justify-between">
+                <Link href="/" className="font-display text-2xl tracking-wide">
                   Fasshon
                 </Link>
-                <nav className="flex items-center gap-5 text-sm">
+                <nav className="flex items-center gap-6 text-sm font-medium">
                   <Link href="/produits" className="transition-colors hover:text-accent">
                     Catalogue
                   </Link>

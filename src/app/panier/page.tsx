@@ -6,7 +6,6 @@ import { useCart } from "@/lib/cart-context";
 import { formatPrice } from "@/lib/format";
 import { ProductImage } from "@/components/ProductImage";
 import { Breadcrumb } from "@/components/Breadcrumb";
-import { TrustBadges } from "@/components/TrustBadges";
 
 function CheckoutSteps({ step }: { step: 1 | 2 }) {
   return (
@@ -69,7 +68,7 @@ export default function PanierPage() {
     return (
       <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 px-4 py-20 text-center">
         <Breadcrumb items={[{ label: "Panier" }]} />
-        <h1 className="text-2xl font-semibold">Votre panier est vide</h1>
+        <h1 className="font-display text-3xl">Votre panier est vide</h1>
         <Link href="/produits" className="text-accent hover:underline">
           Voir le catalogue
         </Link>
@@ -81,7 +80,7 @@ export default function PanierPage() {
     <div className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-10">
       <Breadcrumb items={[{ label: "Panier" }]} />
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Votre panier</h1>
+        <h1 className="font-display text-3xl">Votre panier</h1>
         <CheckoutSteps step={1} />
       </div>
 
@@ -150,12 +149,10 @@ export default function PanierPage() {
         type="button"
         onClick={handleCheckout}
         disabled={loading}
-        className="w-full rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-50"
+        className="btn-primary w-full"
       >
         {loading ? "Redirection vers le paiement…" : "Passer commande"}
       </button>
-
-      <TrustBadges />
 
       <Link href="/produits" className="text-center text-sm text-foreground/60 hover:underline">
         Continuer mes achats

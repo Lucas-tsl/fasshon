@@ -45,7 +45,7 @@ export default async function CommandeSuccesPage({
         <span className="text-4xl" aria-hidden="true">
           🎉
         </span>
-        <h1 className="mt-3 text-2xl font-semibold">Merci pour votre commande !</h1>
+        <h1 className="mt-3 font-display text-3xl">Merci pour votre commande !</h1>
         <p className="mt-2 text-foreground/70">
           Un e-mail de confirmation a été envoyé à {session.customer_details?.email}.
         </p>

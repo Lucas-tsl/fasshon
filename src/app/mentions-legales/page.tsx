@@ -7,7 +7,7 @@ export default function MentionsLegalesPage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-10">
       <Breadcrumb items={[{ label: "Mentions légales" }]} />
-      <h1 className="text-2xl font-semibold">Mentions légales</h1>
+      <h1 className="font-display text-3xl">Mentions légales</h1>
 
       <p className="rounded-lg border border-accent/30 bg-accent/5 p-4 text-sm text-foreground/70">
         Cette page contient des informations à compléter avant toute mise en ligne

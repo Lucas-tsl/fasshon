@@ -84,7 +84,7 @@ export function CartLink() {
           <Link
             href="/panier"
             onClick={() => setOpen(false)}
-            className="rounded-full bg-accent px-4 py-2 text-center text-sm font-medium text-accent-foreground transition hover:opacity-90"
+            className="btn-primary w-full"
           >
             Voir le panier
           </Link>

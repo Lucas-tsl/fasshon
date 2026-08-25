@@ -56,46 +56,31 @@ export default async function ProductPage({
         }))}
       />
 
-      <div className="grid gap-6 border-t border-border pt-6 md:grid-cols-[1fr_18rem]">
-        <div className="flex flex-col gap-4">
-          <div>
-            <Link
-              href={`/produits?categorie=${product.category.slug}`}
-              className="text-sm text-foreground/60 hover:underline"
-            >
-              {product.category.name}
-            </Link>
-            <h1 className="text-2xl font-semibold">{product.name}</h1>
-          </div>
-
-          {product.variants.length === 0 && product.compareAtCents ? (
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-semibold">{formatPrice(product.priceCents)}</span>
-              <span className="text-foreground/40 line-through">
-                {formatPrice(product.compareAtCents)}
-              </span>
-            </div>
-          ) : null}
-
-          <p className="text-sm leading-relaxed text-foreground/70">{product.description}</p>
-
-          <p className="text-xs text-foreground/50">SKU : {product.sku}</p>
+      <div className="flex flex-col gap-4 border-t border-border pt-6">
+        <div>
+          <Link
+            href={`/produits?categorie=${product.category.slug}`}
+            className="text-sm text-foreground/60 hover:underline"
+          >
+            {product.category.name}
+          </Link>
+          <h1 className="font-display text-3xl">{product.name}</h1>
         </div>
 
-        <ul className="flex flex-col gap-3 text-sm text-foreground/70">
-          <li className="flex items-center gap-2">
-            <span aria-hidden="true">🔒</span> Paiement 100% sécurisé
-          </li>
-          <li className="flex items-center gap-2">
-            <span aria-hidden="true">📦</span> Livraison suivie
-          </li>
-          <li className="flex items-center gap-2">
-            <span aria-hidden="true">↩️</span> Retours sous 14 jours
-          </li>
-          <li className="flex items-center gap-2">
-            <span aria-hidden="true">🇫🇷</span> Marque française authentique
-          </li>
-        </ul>
+        {product.variants.length === 0 && product.compareAtCents ? (
+          <div className="flex items-center gap-2">
+            <span className="text-lg font-semibold">{formatPrice(product.priceCents)}</span>
+            <span className="text-foreground/40 line-through">
+              {formatPrice(product.compareAtCents)}
+            </span>
+          </div>
+        ) : null}
+
+        <p className="max-w-2xl text-sm leading-relaxed text-foreground/70">
+          {product.description}
+        </p>
+
+        <p className="text-xs text-foreground/50">SKU : {product.sku}</p>
       </div>
     </div>
   );
