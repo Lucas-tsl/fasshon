@@ -89,11 +89,31 @@ export function inferProductType(name: string): string {
   return "Autres";
 }
 
-// Ordre d'affichage préféré des types. Chaque marque peut introduire ses
-// propres libellés (ex. "Digestifs & Microbiote" pour Physiomins) : ceux
-// qui ne figurent pas ici sont simplement affichés après, avant "Autres".
+// Ordre d'affichage préféré des types, choisi explicitement (indépendant
+// de l'ordre des règles ci-dessus) pour satisfaire l'ordre voulu par
+// marque une fois filtré à ses propres types : LSG doit afficher Brumes,
+// Coffrets, Parfums puis Accessoires ; JOZZ doit afficher Lèvres, Teint,
+// Yeux, Ongles, Coffrets puis Autres. Un seul ordre global peut satisfaire
+// les deux car chaque marque ne voit que ses propres types filtrés.
 export const PRODUCT_TYPE_ORDER: string[] = [
-  ...Array.from(new Set(RULES.map((r) => r.type))),
+  "Brumes & Eaux parfumées",
+  "Lèvres",
+  "Teint",
+  "Palettes & Maquillage yeux",
+  "Vernis & Ongles",
+  "Coffrets & Sets cadeaux",
+  "Parfums",
+  "Accessoires & Divers",
+  "Mascaras & Cils",
+  "Solaire",
+  "Gommages & Exfoliants",
+  "Nettoyants & Démaquillants",
+  "Corps & Bain",
+  "Aromathérapie",
+  "Déodorants",
+  "Sérums, crèmes & soins visage",
+  "Compléments & Bien-être",
+  "Épilation",
   "Plats & Repas protéinés",
   "Entrées & Apéritif",
   "Desserts & Douceurs",
