@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { formatPrice } from "@/lib/format";
-import { ProductImagePlaceholder } from "./ProductImagePlaceholder";
+import { ProductImage } from "./ProductImage";
 
 export function ProductCard({
   product,
@@ -13,6 +13,7 @@ export function ProductCard({
     categorySlug: string;
     brandName: string;
     hasVariants?: boolean;
+    images?: string[];
   };
 }) {
   return (
@@ -20,7 +21,8 @@ export function ProductCard({
       href={`/produits/${product.slug}`}
       className="group flex flex-col gap-3 rounded-xl border border-border p-3 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-accent hover:shadow-lg hover:shadow-black/5"
     >
-      <ProductImagePlaceholder
+      <ProductImage
+        images={product.images ?? []}
         name={product.name}
         categorySlug={product.categorySlug}
         className="aspect-square w-full transition-transform duration-300 ease-out group-hover:scale-[1.03]"

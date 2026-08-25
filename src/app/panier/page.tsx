@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useCart } from "@/lib/cart-context";
 import { formatPrice } from "@/lib/format";
-import { ProductImagePlaceholder } from "@/components/ProductImagePlaceholder";
+import { ProductImage } from "@/components/ProductImage";
 
 export default function PanierPage() {
   const { items, setQuantity, removeItem, subtotalCents } = useCart();
@@ -60,10 +60,12 @@ export default function PanierPage() {
             key={`${item.productId}:${item.variantId ?? ""}`}
             className="flex items-center gap-4 border-b border-border pb-4"
           >
-            <ProductImagePlaceholder
+            <ProductImage
+              images={item.image ? [item.image] : []}
               name={item.name}
               categorySlug={item.categorySlug}
               className="h-16 w-16 shrink-0"
+              sizes="64px"
             />
             <div className="flex-1">
               <p className="text-xs uppercase tracking-wide text-foreground/50">{item.brandName}</p>

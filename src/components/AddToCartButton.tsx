@@ -23,6 +23,7 @@ export function AddToCartButton({
     stock: number;
     brandName: string;
     categorySlug: string;
+    image: string | null;
   };
   variants: Variant[];
 }) {
@@ -80,6 +81,7 @@ export function AddToCartButton({
             priceCents: price,
             brandName: product.brandName,
             categorySlug: product.categorySlug,
+            image: product.image,
           });
           setAdded(true);
           setTimeout(() => setAdded(false), 1500);

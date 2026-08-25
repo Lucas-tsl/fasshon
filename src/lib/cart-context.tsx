@@ -19,6 +19,7 @@ export type CartItem = {
   quantity: number;
   brandName: string;
   categorySlug: string;
+  image: string | null;
 };
 
 type CartContextValue = {

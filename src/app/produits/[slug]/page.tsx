@@ -2,8 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/format";
-import { ProductImagePlaceholder } from "@/components/ProductImagePlaceholder";
+import { ProductImage } from "@/components/ProductImage";
 import { AddToCartButton } from "@/components/AddToCartButton";
+import { parseImages } from "@/lib/product-display";
 
 export default async function ProductPage({
   params,
@@ -27,10 +28,12 @@ export default async function ProductPage({
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-10 md:flex-row">
-      <ProductImagePlaceholder
+      <ProductImage
+        images={parseImages(product.images)}
         name={product.name}
         categorySlug={product.category.slug}
         className="aspect-square w-full md:w-1/2"
+        sizes="(min-width: 768px) 50vw, 100vw"
       />
 
       <div className="flex flex-1 flex-col gap-4">
@@ -68,6 +71,7 @@ export default async function ProductPage({
             stock: product.stock,
             brandName: product.brand.name,
             categorySlug: product.category.slug,
+            image: parseImages(product.images)[0] ?? null,
           }}
           variants={product.variants.map((v) => ({
             id: v.id,
