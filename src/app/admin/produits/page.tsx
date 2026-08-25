@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { AdminNav } from "@/components/AdminNav";
-import { updateProduct, createProduct } from "../actions";
+import { updateProduct, createProduct, updateVariant, createVariant } from "../actions";
 
 export default async function AdminProduitsPage() {
   const [products, categories, brands] = await Promise.all([
     prisma.product.findMany({
-      include: { category: true, brand: true },
+      include: { category: true, brand: true, variants: { orderBy: { position: "asc" } } },
       orderBy: { createdAt: "desc" },
     }),
     prisma.category.findMany({ orderBy: { name: "asc" } }),
@@ -98,6 +98,137 @@ export default async function AdminProduitsPage() {
               <input type="hidden" name="id" value={product.id} />
             </form>
           ))}
+        </div>
+
+        <div>
+          <h2 className="text-2xl font-semibold">Variantes</h2>
+          <p className="mt-1 text-sm text-foreground/60">
+            Déclinaisons (taille, teinte, contenance...) — quand un produit a des variantes,
+            c&apos;est leur prix/stock qui est vendu, pas celui du produit de base.
+          </p>
+
+          <div className="mt-4 flex flex-col gap-6">
+            {products.map((product) => (
+              <div key={product.id} className="rounded-xl border border-border p-4">
+                <p className="text-sm font-medium">{product.name}</p>
+
+                {product.variants.length > 0 ? (
+                  <table className="mt-2 w-full text-sm">
+                    <tbody>
+                      {product.variants.map((variant) => (
+                        <tr key={variant.id} className="border-b border-border last:border-0">
+                          <td className="py-1.5 pr-3">{variant.name}</td>
+                          <td className="py-1.5 pr-3 text-xs text-foreground/50">{variant.sku}</td>
+                          <td className="py-1.5 pr-3">
+                            <input
+                              form={`variant-${variant.id}`}
+                              type="number"
+                              name="price"
+                              step="0.01"
+                              min="0"
+                              defaultValue={(variant.priceCents / 100).toFixed(2)}
+                              className="w-20 rounded border border-border bg-transparent px-2 py-1"
+                            />
+                          </td>
+                          <td className="py-1.5 pr-3">
+                            <input
+                              form={`variant-${variant.id}`}
+                              type="number"
+                              name="stock"
+                              min="0"
+                              defaultValue={variant.stock}
+                              className="w-16 rounded border border-border bg-transparent px-2 py-1"
+                            />
+                          </td>
+                          <td className="py-1.5 pr-3">
+                            <input
+                              form={`variant-${variant.id}`}
+                              type="checkbox"
+                              name="active"
+                              defaultChecked={variant.active}
+                            />
+                          </td>
+                          <td className="py-1.5">
+                            <button
+                              form={`variant-${variant.id}`}
+                              type="submit"
+                              className="rounded-full border border-border px-3 py-1 text-xs hover:border-accent"
+                            >
+                              Enregistrer
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <p className="mt-2 text-xs text-foreground/50">Aucune variante — prix/stock du produit de base utilisés.</p>
+                )}
+
+                {product.variants.map((variant) => (
+                  <form
+                    key={variant.id}
+                    id={`variant-${variant.id}`}
+                    action={updateVariant}
+                    className="hidden"
+                  >
+                    <input type="hidden" name="id" value={variant.id} />
+                  </form>
+                ))}
+
+                <form
+                  action={createVariant}
+                  className="mt-3 flex flex-wrap items-end gap-2 border-t border-border pt-3"
+                >
+                  <input type="hidden" name="productId" value={product.id} />
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs text-foreground/50">Nom</label>
+                    <input
+                      name="name"
+                      placeholder="ex: 50 ml"
+                      required
+                      className="w-28 rounded border border-border bg-transparent px-2 py-1 text-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs text-foreground/50">SKU</label>
+                    <input
+                      name="sku"
+                      required
+                      className="w-24 rounded border border-border bg-transparent px-2 py-1 text-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs text-foreground/50">Prix (€)</label>
+                    <input
+                      name="price"
+                      type="number"
+                      step="0.01"
+                      min="0.01"
+                      required
+                      className="w-20 rounded border border-border bg-transparent px-2 py-1 text-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs text-foreground/50">Stock</label>
+                    <input
+                      name="stock"
+                      type="number"
+                      min="0"
+                      defaultValue={0}
+                      className="w-16 rounded border border-border bg-transparent px-2 py-1 text-sm"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="rounded-full border border-border px-3 py-1.5 text-xs hover:border-accent"
+                  >
+                    Ajouter la variante
+                  </button>
+                </form>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div>

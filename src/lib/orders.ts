@@ -1,7 +1,7 @@
 import type Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 
-type CartMetaEntry = { p: string; q: number };
+type CartMetaEntry = { p: string; v: string | null; q: number };
 
 /**
  * Idempotent: safe to call multiple times for the same Checkout Session
@@ -26,6 +26,7 @@ export async function recordOrderFromCheckoutSession(session: Stripe.Checkout.Se
 
   const products = await prisma.product.findMany({
     where: { id: { in: cart.map((c) => c.p) } },
+    include: { variants: true },
   });
 
   return prisma.$transaction(async (tx) => {
@@ -40,10 +41,13 @@ export async function recordOrderFromCheckoutSession(session: Stripe.Checkout.Se
             .map((entry) => {
               const product = products.find((p) => p.id === entry.p);
               if (!product) return null;
+              const variant = entry.v ? product.variants.find((v) => v.id === entry.v) : null;
               return {
                 productId: product.id,
+                variantId: variant?.id ?? null,
                 nameSnap: product.name,
-                priceCents: product.priceCents,
+                variantNameSnap: variant?.name ?? null,
+                priceCents: variant?.priceCents ?? product.priceCents,
                 quantity: entry.q,
               };
             })
@@ -54,10 +58,17 @@ export async function recordOrderFromCheckoutSession(session: Stripe.Checkout.Se
     });
 
     for (const entry of cart) {
-      await tx.product.updateMany({
-        where: { id: entry.p },
-        data: { stock: { decrement: entry.q } },
-      });
+      if (entry.v) {
+        await tx.productVariant.updateMany({
+          where: { id: entry.v },
+          data: { stock: { decrement: entry.q } },
+        });
+      } else {
+        await tx.product.updateMany({
+          where: { id: entry.p },
+          data: { stock: { decrement: entry.q } },
+        });
+      }
     }
 
     return order;

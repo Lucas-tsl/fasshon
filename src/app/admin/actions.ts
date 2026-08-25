@@ -94,6 +94,47 @@ export async function createProduct(formData: FormData) {
   revalidatePath("/produits");
 }
 
+export async function updateVariant(formData: FormData) {
+  await requireAdmin();
+  const id = String(formData.get("id") ?? "");
+  const priceCents = Math.round(Number(formData.get("price")) * 100);
+  const stock = Number(formData.get("stock"));
+  const active = formData.get("active") === "on";
+
+  if (
+    !id ||
+    !Number.isFinite(priceCents) ||
+    priceCents < 0 ||
+    !Number.isInteger(stock) ||
+    stock < 0
+  ) {
+    throw new Error("Champs invalides.");
+  }
+
+  await prisma.productVariant.update({ where: { id }, data: { priceCents, stock, active } });
+  revalidatePath("/admin/produits");
+  revalidatePath("/produits");
+}
+
+export async function createVariant(formData: FormData) {
+  await requireAdmin();
+  const productId = String(formData.get("productId") ?? "");
+  const name = String(formData.get("name") ?? "").trim();
+  const sku = String(formData.get("sku") ?? "").trim();
+  const priceCents = Math.round(Number(formData.get("price")) * 100);
+  const stock = Number(formData.get("stock")) || 0;
+
+  if (!productId || !name || !sku || !Number.isFinite(priceCents) || priceCents <= 0) {
+    throw new Error("Champs invalides.");
+  }
+
+  await prisma.productVariant.create({
+    data: { productId, name, sku, priceCents, stock, position: 0 },
+  });
+  revalidatePath("/admin/produits");
+  revalidatePath("/produits");
+}
+
 function slugify(input: string): string {
   return input
     .toLowerCase()

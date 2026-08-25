@@ -11,6 +11,8 @@ import {
 
 export type CartItem = {
   productId: string;
+  variantId: string | null;
+  variantName: string | null;
   slug: string;
   name: string;
   priceCents: number;
@@ -22,8 +24,8 @@ export type CartItem = {
 type CartContextValue = {
   items: CartItem[];
   addItem: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
-  removeItem: (productId: string) => void;
-  setQuantity: (productId: string, quantity: number) => void;
+  removeItem: (productId: string, variantId?: string | null) => void;
+  setQuantity: (productId: string, variantId: string | null, quantity: number) => void;
   clear: () => void;
   subtotalCents: number;
   count: number;
@@ -32,6 +34,10 @@ type CartContextValue = {
 const CartContext = createContext<CartContextValue | null>(null);
 
 const STORAGE_KEY = "fasshon-cart";
+
+function lineKey(productId: string, variantId: string | null | undefined) {
+  return `${productId}:${variantId ?? ""}`;
+}
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -59,10 +65,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addItem: CartContextValue["addItem"] = (item, quantity = 1) => {
     setItems((current) => {
-      const existing = current.find((i) => i.productId === item.productId);
+      const key = lineKey(item.productId, item.variantId);
+      const existing = current.find((i) => lineKey(i.productId, i.variantId) === key);
       if (existing) {
         return current.map((i) =>
-          i.productId === item.productId
+          lineKey(i.productId, i.variantId) === key
             ? { ...i, quantity: i.quantity + quantity }
             : i,
         );
@@ -71,15 +78,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const removeItem: CartContextValue["removeItem"] = (productId) => {
-    setItems((current) => current.filter((i) => i.productId !== productId));
+  const removeItem: CartContextValue["removeItem"] = (productId, variantId = null) => {
+    const key = lineKey(productId, variantId);
+    setItems((current) => current.filter((i) => lineKey(i.productId, i.variantId) !== key));
   };
 
-  const setQuantity: CartContextValue["setQuantity"] = (productId, quantity) => {
+  const setQuantity: CartContextValue["setQuantity"] = (productId, variantId, quantity) => {
+    const key = lineKey(productId, variantId);
     setItems((current) =>
       quantity <= 0
-        ? current.filter((i) => i.productId !== productId)
-        : current.map((i) => (i.productId === productId ? { ...i, quantity } : i)),
+        ? current.filter((i) => lineKey(i.productId, i.variantId) !== key)
+        : current.map((i) => (lineKey(i.productId, i.variantId) === key ? { ...i, quantity } : i)),
     );
   };
 

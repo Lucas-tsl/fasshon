@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
 
-type CartInput = { productId: string; quantity: number };
+type CartInput = { productId: string; variantId: string | null; quantity: number };
 
 export async function POST(request: NextRequest) {
   let body: { items?: CartInput[] };
@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
   const items = rawItems.filter(
     (i): i is CartInput =>
       typeof i?.productId === "string" &&
+      (i.variantId === null || typeof i.variantId === "string") &&
       Number.isInteger(i?.quantity) &&
       i.quantity > 0 &&
       i.quantity <= 20,
@@ -27,6 +28,7 @@ export async function POST(request: NextRequest) {
 
   const products = await prisma.product.findMany({
     where: { id: { in: items.map((i) => i.productId) }, active: true },
+    include: { variants: true },
   });
 
   const lineItems: Array<{
@@ -46,23 +48,50 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
-    if (product.stock < item.quantity) {
-      return NextResponse.json(
-        { error: `Stock insuffisant pour "${product.name}".` },
-        { status: 400 },
-      );
+
+    if (item.variantId) {
+      const variant = product.variants.find((v) => v.id === item.variantId && v.active);
+      if (!variant) {
+        return NextResponse.json(
+          { error: `Variante indisponible pour "${product.name}".` },
+          { status: 400 },
+        );
+      }
+      if (variant.stock < item.quantity) {
+        return NextResponse.json(
+          { error: `Stock insuffisant pour "${product.name} — ${variant.name}".` },
+          { status: 400 },
+        );
+      }
+      lineItems.push({
+        price_data: {
+          currency: "eur",
+          unit_amount: variant.priceCents,
+          product_data: { name: `${product.name} — ${variant.name}` },
+        },
+        quantity: item.quantity,
+      });
+    } else {
+      if (product.stock < item.quantity) {
+        return NextResponse.json(
+          { error: `Stock insuffisant pour "${product.name}".` },
+          { status: 400 },
+        );
+      }
+      lineItems.push({
+        price_data: {
+          currency: "eur",
+          unit_amount: product.priceCents,
+          product_data: { name: product.name },
+        },
+        quantity: item.quantity,
+      });
     }
-    lineItems.push({
-      price_data: {
-        currency: "eur",
-        unit_amount: product.priceCents,
-        product_data: { name: product.name },
-      },
-      quantity: item.quantity,
-    });
   }
 
-  const cartMeta = JSON.stringify(items.map((i) => ({ p: i.productId, q: i.quantity })));
+  const cartMeta = JSON.stringify(
+    items.map((i) => ({ p: i.productId, v: i.variantId, q: i.quantity })),
+  );
   if (cartMeta.length > 480) {
     return NextResponse.json(
       { error: "Panier trop volumineux, réduisez le nombre d'articles." },

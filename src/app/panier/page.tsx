@@ -19,7 +19,11 @@ export default function PanierPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
+          items: items.map((i) => ({
+            productId: i.productId,
+            variantId: i.variantId,
+            quantity: i.quantity,
+          })),
         }),
       });
       const data = await res.json();
@@ -52,7 +56,10 @@ export default function PanierPage() {
 
       <ul className="flex flex-col gap-4">
         {items.map((item) => (
-          <li key={item.productId} className="flex items-center gap-4 border-b border-border pb-4">
+          <li
+            key={`${item.productId}:${item.variantId ?? ""}`}
+            className="flex items-center gap-4 border-b border-border pb-4"
+          >
             <ProductImagePlaceholder
               name={item.name}
               categorySlug={item.categorySlug}
@@ -61,13 +68,16 @@ export default function PanierPage() {
             <div className="flex-1">
               <p className="text-xs uppercase tracking-wide text-foreground/50">{item.brandName}</p>
               <p className="text-sm font-medium">{item.name}</p>
+              {item.variantName ? (
+                <p className="text-xs text-foreground/50">{item.variantName}</p>
+              ) : null}
               <p className="text-sm text-foreground/60">{formatPrice(item.priceCents)}</p>
             </div>
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => setQuantity(item.productId, item.quantity - 1)}
-                className="h-7 w-7 rounded-full border border-border"
+                onClick={() => setQuantity(item.productId, item.variantId, item.quantity - 1)}
+                className="h-7 w-7 rounded-full border border-border transition hover:border-accent"
                 aria-label="Diminuer la quantité"
               >
                 −
@@ -75,8 +85,8 @@ export default function PanierPage() {
               <span className="w-6 text-center text-sm">{item.quantity}</span>
               <button
                 type="button"
-                onClick={() => setQuantity(item.productId, item.quantity + 1)}
-                className="h-7 w-7 rounded-full border border-border"
+                onClick={() => setQuantity(item.productId, item.variantId, item.quantity + 1)}
+                className="h-7 w-7 rounded-full border border-border transition hover:border-accent"
                 aria-label="Augmenter la quantité"
               >
                 +
@@ -87,7 +97,7 @@ export default function PanierPage() {
             </p>
             <button
               type="button"
-              onClick={() => removeItem(item.productId)}
+              onClick={() => removeItem(item.productId, item.variantId)}
               className="text-xs text-foreground/50 hover:text-foreground"
             >
               Retirer
@@ -107,7 +117,7 @@ export default function PanierPage() {
         type="button"
         onClick={handleCheckout}
         disabled={loading}
-        className="w-full rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-foreground disabled:opacity-50"
+        className="w-full rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-50"
       >
         {loading ? "Redirection vers le paiement…" : "Passer commande"}
       </button>

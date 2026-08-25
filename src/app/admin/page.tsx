@@ -48,7 +48,9 @@ export default async function AdminOrdersPage() {
                 <ul className="mt-3 flex flex-col gap-1 text-sm text-foreground/70">
                   {order.items.map((item) => (
                     <li key={item.id}>
-                      {item.quantity} × {item.nameSnap} — {formatPrice(item.priceCents * item.quantity)}
+                      {item.quantity} × {item.nameSnap}
+                      {item.variantNameSnap ? ` — ${item.variantNameSnap}` : ""} —{" "}
+                      {formatPrice(item.priceCents * item.quantity)}
                     </li>
                   ))}
                 </ul>

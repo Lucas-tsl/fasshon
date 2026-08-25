@@ -14,14 +14,16 @@ export default async function ProductPage({
 
   const product = await prisma.product.findUnique({
     where: { slug },
-    include: { category: true, brand: true },
+    include: {
+      category: true,
+      brand: true,
+      variants: { where: { active: true }, orderBy: { position: "asc" } },
+    },
   });
 
   if (!product || !product.active) {
     notFound();
   }
-
-  const outOfStock = product.stock <= 0;
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-10 md:flex-row">
@@ -44,14 +46,14 @@ export default async function ProductPage({
 
         <h1 className="text-2xl font-semibold">{product.name}</h1>
 
-        <div className="flex items-center gap-2">
-          <span className="text-xl font-semibold">{formatPrice(product.priceCents)}</span>
-          {product.compareAtCents ? (
+        {product.variants.length === 0 && product.compareAtCents ? (
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-semibold">{formatPrice(product.priceCents)}</span>
             <span className="text-foreground/40 line-through">
               {formatPrice(product.compareAtCents)}
             </span>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
 
         <p className="text-sm leading-relaxed text-foreground/70">{product.description}</p>
 
@@ -63,10 +65,16 @@ export default async function ProductPage({
             slug: product.slug,
             name: product.name,
             priceCents: product.priceCents,
+            stock: product.stock,
             brandName: product.brand.name,
             categorySlug: product.category.slug,
           }}
-          outOfStock={outOfStock}
+          variants={product.variants.map((v) => ({
+            id: v.id,
+            name: v.name,
+            priceCents: v.priceCents,
+            stock: v.stock,
+          }))}
         />
       </div>
     </div>

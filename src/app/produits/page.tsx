@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ProductCard } from "@/components/ProductCard";
+import { toCardProduct } from "@/lib/product-display";
 
 export const metadata = {
   title: "Catalogue",
@@ -22,7 +23,7 @@ export default async function ProduitsPage({
         ...(categorie ? { category: { slug: categorie } } : {}),
         ...(marque ? { brand: { slug: marque } } : {}),
       },
-      include: { category: true, brand: true },
+      include: { category: true, brand: true, variants: { where: { active: true } } },
       orderBy: { createdAt: "desc" },
     }),
   ]);
@@ -36,8 +37,8 @@ export default async function ProduitsPage({
   };
 
   const pill = (active: boolean) =>
-    `rounded-full border px-3 py-1 text-sm ${
-      active ? "border-accent bg-accent text-accent-foreground" : "border-border"
+    `rounded-full border px-3 py-1 text-sm transition-colors ${
+      active ? "border-accent bg-accent text-accent-foreground" : "border-border hover:border-accent"
     }`;
 
   return (
@@ -83,17 +84,7 @@ export default async function ProduitsPage({
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
           {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={{
-                slug: product.slug,
-                name: product.name,
-                priceCents: product.priceCents,
-                compareAtCents: product.compareAtCents,
-                categorySlug: product.category.slug,
-                brandName: product.brand.name,
-              }}
-            />
+            <ProductCard key={product.id} product={toCardProduct(product)} />
           ))}
         </div>
       )}
