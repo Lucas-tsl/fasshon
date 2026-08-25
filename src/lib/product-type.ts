@@ -98,7 +98,8 @@ export function inferProductType(name: string): string {
 // Complément, Crème, Nutrition, Cures, Anti-gaspi puis Accessoire ; Pur
 // Eden doit afficher Nettoyant, Hydratant, Protection puis soins. Un seul
 // ordre global peut satisfaire tout ça car chaque marque ne voit que ses
-// propres types filtrés.
+// propres types filtrés. Les types "accessoires" sont volontairement
+// placés tout à la fin (juste avant "Autres") pour toutes les marques.
 export const PRODUCT_TYPE_ORDER: string[] = [
   "Brumes & Eaux parfumées",
   "Lèvres",
@@ -107,7 +108,6 @@ export const PRODUCT_TYPE_ORDER: string[] = [
   "Vernis & Ongles",
   "Coffrets & Sets cadeaux",
   "Parfums",
-  "Accessoires & Divers",
   "Mascaras & Cils",
   "Solaire",
   "Gommages & Exfoliants",
@@ -123,10 +123,11 @@ export const PRODUCT_TYPE_ORDER: string[] = [
   "Nutrition",
   "Cures",
   "Anti-gaspi",
-  "Accessoire",
   "Nettoyant",
   "Hydratant",
   "Protection",
   "soins",
+  "Accessoires & Divers",
+  "Accessoire",
   "Autres",
 ];
