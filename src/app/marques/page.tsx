@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export const metadata = { title: "Nos marques" };
 
@@ -24,13 +25,11 @@ export default async function MarquesPage() {
           <Link
             key={brand.id}
             href={`/marques/${brand.slug}`}
-            className="group flex flex-col gap-2 rounded-2xl border border-border p-6 transition hover:border-accent hover:shadow-lg hover:shadow-black/5"
+            className="group flex flex-col gap-3 rounded-2xl border border-border p-6 transition hover:border-accent hover:shadow-lg hover:shadow-black/5"
           >
-            <h2 className="text-lg font-medium transition group-hover:text-accent">
-              {brand.name}
-            </h2>
+            <BrandLogo name={brand.name} logoPath={brand.logoPath} className="h-9" />
             <p className="text-sm text-foreground/60">{brand.description}</p>
-            <span className="mt-2 text-xs uppercase tracking-wide text-foreground/40">
+            <span className="text-xs uppercase tracking-wide text-foreground/40">
               {brand._count.products} produit{brand._count.products > 1 ? "s" : ""}
             </span>
           </Link>

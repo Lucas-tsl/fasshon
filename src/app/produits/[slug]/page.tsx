@@ -5,6 +5,7 @@ import { formatPrice } from "@/lib/format";
 import { ProductImage } from "@/components/ProductImage";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { parseImages } from "@/lib/product-display";
+import { Breadcrumb } from "@/components/Breadcrumb";
 
 export default async function ProductPage({
   params,
@@ -27,7 +28,15 @@ export default async function ProductPage({
   }
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-10 md:flex-row">
+    <div className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10">
+      <Breadcrumb
+        items={[
+          { label: "Catalogue", href: "/produits" },
+          { label: product.brand.name, href: `/marques/${product.brand.slug}` },
+          { label: product.name },
+        ]}
+      />
+      <div className="flex flex-col gap-8 md:flex-row">
       <ProductImage
         images={parseImages(product.images)}
         name={product.name}
@@ -37,15 +46,12 @@ export default async function ProductPage({
       />
 
       <div className="flex flex-1 flex-col gap-4">
-        <div className="flex flex-wrap gap-2 text-sm text-foreground/60">
-          <Link href={`/produits?marque=${product.brand.slug}`} className="hover:underline">
-            {product.brand.name}
-          </Link>
-          <span>·</span>
-          <Link href={`/produits?categorie=${product.category.slug}`} className="hover:underline">
-            {product.category.name}
-          </Link>
-        </div>
+        <Link
+          href={`/produits?categorie=${product.category.slug}`}
+          className="text-sm text-foreground/60 hover:underline"
+        >
+          {product.category.name}
+        </Link>
 
         <h1 className="text-2xl font-semibold">{product.name}</h1>
 
@@ -80,6 +86,7 @@ export default async function ProductPage({
             stock: v.stock,
           }))}
         />
+      </div>
       </div>
     </div>
   );

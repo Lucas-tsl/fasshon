@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ProductCard } from "@/components/ProductCard";
 import { toCardProduct, groupByType } from "@/lib/product-display";
+import { Breadcrumb } from "@/components/Breadcrumb";
 
 export const metadata = {
   title: "Catalogue",
@@ -43,6 +44,7 @@ export default async function ProduitsPage({
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10">
+      <Breadcrumb items={[{ label: "Catalogue" }]} />
       <h1 className="text-2xl font-semibold">Catalogue</h1>
 
       <div className="flex flex-col gap-2">

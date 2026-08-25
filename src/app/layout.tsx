@@ -5,6 +5,8 @@ import "./globals.css";
 import { CartProvider } from "@/lib/cart-context";
 import { CartLink } from "@/components/CartLink";
 import { BrandsMenu } from "@/components/BrandsMenu";
+import { AnnouncementBar } from "@/components/AnnouncementBar";
+import { Footer } from "@/components/Footer";
 import { prisma } from "@/lib/prisma";
 
 const geistSans = Geist({
@@ -43,21 +45,25 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <CartProvider>
-          <header className="sticky top-0 z-30 border-b border-border bg-background/85 px-4 py-4 backdrop-blur-sm">
-            <div className="mx-auto flex max-w-5xl items-center justify-between">
-              <Link href="/" className="text-lg font-semibold tracking-tight">
-                Fasshon
-              </Link>
-              <nav className="flex items-center gap-5 text-sm">
-                <Link href="/produits" className="transition-colors hover:text-accent">
-                  Catalogue
+          <div className="sticky top-0 z-30">
+            <AnnouncementBar />
+            <header className="border-b border-border bg-background/85 px-4 py-4 backdrop-blur-sm">
+              <div className="mx-auto flex max-w-5xl items-center justify-between">
+                <Link href="/" className="text-lg font-semibold tracking-tight">
+                  Fasshon
                 </Link>
-                <BrandsMenu brands={brands} />
-                <CartLink />
-              </nav>
-            </div>
-          </header>
+                <nav className="flex items-center gap-5 text-sm">
+                  <Link href="/produits" className="transition-colors hover:text-accent">
+                    Catalogue
+                  </Link>
+                  <BrandsMenu brands={brands} />
+                  <CartLink />
+                </nav>
+              </div>
+            </header>
+          </div>
           <main className="flex flex-1 flex-col">{children}</main>
+          <Footer />
         </CartProvider>
       </body>
     </html>

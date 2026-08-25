@@ -18,6 +18,7 @@ model Brand {
   name        String
   description String?
   websiteUrl  String?
+  logoPath    String? // chemin local vers le logo officiel (public/brands/...)
   products    Product[]
 }
 

@@ -1,8 +1,9 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { ProductCard } from "@/components/ProductCard";
 import { toCardProduct, groupByType } from "@/lib/product-display";
+import { BrandLogo } from "@/components/BrandLogo";
+import { Breadcrumb } from "@/components/Breadcrumb";
 
 export default async function MarquePage({
   params,
@@ -26,13 +27,11 @@ export default async function MarquePage({
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-10">
-      <div>
-        <Link href="/marques" className="text-sm text-foreground/60 hover:underline">
-          ← Toutes les marques
-        </Link>
-        <h1 className="mt-2 text-2xl font-semibold">{brand.name}</h1>
+      <div className="flex flex-col gap-4">
+        <Breadcrumb items={[{ label: "Marques", href: "/marques" }, { label: brand.name }]} />
+        <BrandLogo name={brand.name} logoPath={brand.logoPath} className="h-10" />
         {brand.description ? (
-          <p className="mt-2 max-w-xl text-sm text-foreground/60">{brand.description}</p>
+          <p className="max-w-xl text-sm text-foreground/60">{brand.description}</p>
         ) : null}
       </div>
 

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ProductCard } from "@/components/ProductCard";
 import { toCardProduct } from "@/lib/product-display";
+import { BrandLogo } from "@/components/BrandLogo";
+import { Carousel, CarouselItem } from "@/components/Carousel";
 
 export default async function Home() {
   const [products, brands] = await Promise.all([
@@ -9,7 +11,7 @@ export default async function Home() {
       where: { active: true },
       include: { category: true, brand: true, variants: { where: { active: true } } },
       orderBy: { createdAt: "desc" },
-      take: 4,
+      take: 12,
     }),
     prisma.brand.findMany({ orderBy: { name: "asc" } }),
   ]);
@@ -49,12 +51,10 @@ export default async function Home() {
             <Link
               key={brand.id}
               href={`/marques/${brand.slug}`}
-              className="animate-fade-in-up group rounded-xl border border-border p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-lg hover:shadow-black/5"
+              className="animate-fade-in-up group flex items-center justify-center rounded-xl border border-border p-6 transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-lg hover:shadow-black/5"
               style={{ animationDelay: `${i * 0.05}s` }}
             >
-              <span className="text-sm font-medium transition-colors group-hover:text-accent">
-                {brand.name}
-              </span>
+              <BrandLogo name={brand.name} logoPath={brand.logoPath} className="h-8" />
             </Link>
           ))}
         </div>
@@ -62,17 +62,13 @@ export default async function Home() {
 
       <section className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 py-10">
         <h2 className="text-lg font-medium">Nouveautés</h2>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          {products.map((product, i) => (
-            <div
-              key={product.id}
-              className="animate-fade-in-up"
-              style={{ animationDelay: `${i * 0.06}s` }}
-            >
+        <Carousel>
+          {products.map((product) => (
+            <CarouselItem key={product.id}>
               <ProductCard product={toCardProduct(product)} />
-            </div>
+            </CarouselItem>
           ))}
-        </div>
+        </Carousel>
       </section>
     </div>
   );
