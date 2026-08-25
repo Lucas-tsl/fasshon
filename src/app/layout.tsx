@@ -9,6 +9,7 @@ import { AnnouncementBar } from "@/components/AnnouncementBar";
 import { Footer } from "@/components/Footer";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/user-auth";
+import { AccountIcon } from "@/components/AccountIcon";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -67,9 +68,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                     Catalogue
                   </Link>
                   <BrandsMenu brands={brands} />
-                  <Link href={user ? "/compte" : "/compte/connexion"} className="transition-colors hover:text-accent">
-                    {user ? "Mon compte" : "Connexion"}
-                  </Link>
+                  <AccountIcon connected={!!user} />
                   <CartLink />
                 </nav>
               </div>

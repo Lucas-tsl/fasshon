@@ -35,6 +35,9 @@ export default async function ConnexionPage({
           Se connecter
         </button>
       </form>
+      <Link href="/compte/mot-de-passe-oublie" className="text-sm text-accent hover:underline">
+        Mot de passe oublié ?
+      </Link>
       <p className="text-sm text-foreground/60">
         Pas encore de compte ?{" "}
         <Link href="/compte/inscription" className="text-accent hover:underline">

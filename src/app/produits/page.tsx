@@ -29,7 +29,7 @@ export default async function ProduitsPage({
         ...(marque ? { brand: { slug: marque } } : {}),
       },
       include: { category: true, brand: true, variants: { where: { active: true } } },
-      orderBy: { createdAt: "desc" },
+      orderBy: { name: "asc" },
     }),
     getWishlistedProductIds(),
   ]);

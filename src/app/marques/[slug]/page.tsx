@@ -23,7 +23,7 @@ export default async function MarquePage({
         products: {
           where: { active: true },
           include: { category: true, brand: true, variants: { where: { active: true } } },
-          orderBy: { createdAt: "desc" },
+          orderBy: { name: "asc" },
         },
       },
     }),

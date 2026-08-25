@@ -1,10 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useCart } from "@/lib/cart-context";
 import { formatPrice } from "@/lib/format";
 import { ProductImage } from "./ProductImage";
 import { WishlistButton } from "./WishlistButton";
+import { StarRating } from "./StarRating";
 
 type Variant = {
   id: string;
@@ -54,11 +56,17 @@ export function ProductGallery({
     id: string;
     slug: string;
     name: string;
+    description: string;
+    sku: string;
     priceCents: number;
+    compareAtCents: number | null;
     stock: number;
     brandName: string;
+    categoryName: string;
     categorySlug: string;
     images: string[];
+    averageRating: number;
+    reviewCount: number;
   };
   variants: Variant[];
 }) {
@@ -154,6 +162,27 @@ export function ProductGallery({
       </div>
 
       <div className="flex flex-1 flex-col gap-3">
+        <div>
+          <Link
+            href={`/produits?categorie=${product.categorySlug}`}
+            className="text-sm text-foreground/60 hover:underline"
+          >
+            {product.categoryName}
+          </Link>
+          <h1 className="font-display text-3xl">{product.name}</h1>
+          {product.reviewCount > 0 ? (
+            <a href="#avis" className="mt-1 inline-block">
+              <StarRating value={product.averageRating} count={product.reviewCount} />
+            </a>
+          ) : null}
+        </div>
+
+        <p className="max-w-md text-sm leading-relaxed text-foreground/70">
+          {product.description}
+        </p>
+
+        <p className="text-xs text-foreground/50">SKU : {product.sku}</p>
+
         {hasVariants ? (
           <div className="flex flex-wrap gap-2">
             {variants.map((variant) => (
@@ -175,7 +204,14 @@ export function ProductGallery({
           </div>
         ) : null}
 
-        <span className="font-display text-3xl">{formatPrice(price)}</span>
+        <div className="flex items-center gap-2">
+          <span className="font-display text-3xl">{formatPrice(price)}</span>
+          {!hasVariants && product.compareAtCents ? (
+            <span className="text-foreground/40 line-through">
+              {formatPrice(product.compareAtCents)}
+            </span>
+          ) : null}
+        </div>
 
         <div ref={ctaRef} className="flex flex-wrap items-center gap-3">
           <QuantityCounter quantity={quantity} onChange={setQuantity} max={Math.min(stock, 20)} />

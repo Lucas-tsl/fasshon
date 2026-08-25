@@ -39,7 +39,12 @@ export function proxy(request: NextRequest) {
   }
 
   if (pathname.startsWith("/compte")) {
-    if (pathname === "/compte/connexion" || pathname === "/compte/inscription") {
+    if (
+      pathname === "/compte/connexion" ||
+      pathname === "/compte/inscription" ||
+      pathname === "/compte/mot-de-passe-oublie" ||
+      pathname === "/compte/reinitialiser"
+    ) {
       return NextResponse.next();
     }
     const authenticated = isValidUserSession(request.cookies.get(USER_COOKIE_NAME)?.value);
