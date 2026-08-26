@@ -1,0 +1,11 @@
+{
+  "region": "eu-central-1",
+  "app": {
+    "name": "ecommerce",
+    "framework": "nextjs",
+    "httpPort": 3000,
+    "build": {
+      "command": "npm run build"
+    }
+  }
+}
