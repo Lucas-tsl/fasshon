@@ -69,7 +69,7 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const [brands, user] = await Promise.all([
     prisma.brand.findMany({
-      orderBy: { name: "asc" },
+      orderBy: { displayOrder: "asc" },
       select: { slug: true, name: true },
     }),
     getCurrentUser(),

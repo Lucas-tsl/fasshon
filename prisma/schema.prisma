@@ -22,6 +22,7 @@ model Brand {
   youtubeUrl   String?
   tiktokUrl    String?
   instagramUrl String?
+  displayOrder Int       @default(0) // ordre d'affichage (marques les plus vendues en premier)
   products     Product[]
 }
 

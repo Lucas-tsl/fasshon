@@ -39,7 +39,7 @@ const TYPE_EMOJI: Record<string, string> = {
 
 export default async function Home() {
   const [brands, typeCounts, wishlistedIds] = await Promise.all([
-    prisma.brand.findMany({ orderBy: { name: "asc" } }),
+    prisma.brand.findMany({ orderBy: { displayOrder: "asc" } }),
     prisma.product.groupBy({
       by: ["productType"],
       where: { active: true, productType: { not: null } },

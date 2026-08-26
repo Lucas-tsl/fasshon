@@ -22,7 +22,7 @@ export default async function ProduitsPage({
 
   const [categories, brands, matchingProducts, wishlistedIds] = await Promise.all([
     prisma.category.findMany({ orderBy: { name: "asc" } }),
-    prisma.brand.findMany({ orderBy: { name: "asc" } }),
+    prisma.brand.findMany({ orderBy: { displayOrder: "asc" } }),
     prisma.product.findMany({
       where: {
         active: true,

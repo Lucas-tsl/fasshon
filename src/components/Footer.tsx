@@ -6,7 +6,7 @@ import { TrustBadges } from "./TrustBadges";
 
 export async function Footer() {
   const brands = await prisma.brand.findMany({
-    orderBy: { name: "asc" },
+    orderBy: { displayOrder: "asc" },
     select: { slug: true, name: true, logoPath: true },
   });
 

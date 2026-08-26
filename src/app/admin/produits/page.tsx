@@ -9,7 +9,7 @@ export default async function AdminProduitsPage() {
       orderBy: { createdAt: "desc" },
     }),
     prisma.category.findMany({ orderBy: { name: "asc" } }),
-    prisma.brand.findMany({ orderBy: { name: "asc" } }),
+    prisma.brand.findMany({ orderBy: { displayOrder: "asc" } }),
   ]);
 
   return (

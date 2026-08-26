@@ -10,7 +10,7 @@ export const metadata = {
 
 export default async function MarquesPage() {
   const brands = await prisma.brand.findMany({
-    orderBy: { name: "asc" },
+    orderBy: { displayOrder: "asc" },
     include: { _count: { select: { products: true } } },
   });
 

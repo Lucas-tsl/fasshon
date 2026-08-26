@@ -34,6 +34,7 @@ export default async function RecherchePage({
   const [brands, products, posts, wishlistedIds] = await Promise.all([
     prisma.brand.findMany({
       where: { name: { contains: query, mode: "insensitive" } },
+      orderBy: { displayOrder: "asc" },
     }),
     prisma.product.findMany({
       where: {
