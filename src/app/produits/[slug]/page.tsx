@@ -12,6 +12,28 @@ import { getCurrentUser } from "@/lib/user-auth";
 import { getWishlistedProductIds } from "@/lib/wishlist";
 import { Carousel, CarouselItem } from "@/components/Carousel";
 import { BlogImage } from "@/components/BlogImage";
+import { toJsonLd } from "@/lib/json-ld";
+import { SITE_URL } from "@/lib/site";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const product = await prisma.product.findUnique({
+    where: { slug },
+    select: { name: true, description: true, brand: { select: { name: true } } },
+  });
+  if (!product) return { title: "Produit introuvable" };
+
+  const description = product.description.slice(0, 155);
+  return {
+    title: `${product.name} — ${product.brand.name}`,
+    description,
+    openGraph: { title: product.name, description },
+  };
+}
 
 export default async function ProductPage({
   params,
@@ -47,6 +69,46 @@ export default async function ProductPage({
     ? product.reviews.find((r) => r.userId === currentUser.id)
     : undefined;
 
+  const productImages = parseImages(product.images).map((img) => `${SITE_URL}${img}`);
+  const variantPrices = product.variants.map((v) => v.priceCents);
+  const inStock = product.variants.length > 0 ? product.variants.some((v) => v.stock > 0) : product.stock > 0;
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description,
+    sku: product.sku,
+    image: productImages,
+    brand: { "@type": "Brand", name: product.brand.name },
+    ...(product.reviews.length > 0
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: averageRating.toFixed(1),
+            reviewCount: product.reviews.length,
+          },
+        }
+      : {}),
+    offers:
+      variantPrices.length > 0
+        ? {
+            "@type": "AggregateOffer",
+            priceCurrency: "EUR",
+            lowPrice: (Math.min(...variantPrices) / 100).toFixed(2),
+            highPrice: (Math.max(...variantPrices) / 100).toFixed(2),
+            offerCount: variantPrices.length,
+            availability: inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            url: `${SITE_URL}/produits/${product.slug}`,
+          }
+        : {
+            "@type": "Offer",
+            priceCurrency: "EUR",
+            price: (product.priceCents / 100).toFixed(2),
+            availability: inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            url: `${SITE_URL}/produits/${product.slug}`,
+          },
+  };
+
   const similarProducts = await prisma.product.findMany({
     where: {
       id: { not: product.id },
@@ -80,6 +142,7 @@ export default async function ProductPage({
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: toJsonLd(productSchema) }} />
       <Breadcrumb
         items={[
           { label: "Catalogue", href: "/produits" },
