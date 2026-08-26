@@ -1,6 +1,10 @@
 import { Breadcrumb } from "@/components/Breadcrumb";
 
-export const metadata = { title: "Notre équipe" };
+export const metadata = {
+  title: "Notre équipe",
+  description: "Découvrez l'équipe derrière Fasshon, concept store multi-marques français.",
+  alternates: { canonical: "/equipe" },
+};
 
 export default function EquipePage() {
   return (

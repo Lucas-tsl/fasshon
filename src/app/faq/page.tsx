@@ -1,7 +1,11 @@
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { LegalPlaceholder as Placeholder } from "@/components/LegalPlaceholder";
 
-export const metadata = { title: "FAQ" };
+export const metadata = {
+  title: "FAQ",
+  description: "Livraison, retours, paiement : les réponses aux questions les plus fréquentes sur Fasshon.",
+  alternates: { canonical: "/faq" },
+};
 
 const FAQS = [
   {

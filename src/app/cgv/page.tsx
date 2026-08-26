@@ -1,7 +1,11 @@
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { LegalPlaceholder as Placeholder } from "@/components/LegalPlaceholder";
 
-export const metadata = { title: "Conditions générales de vente" };
+export const metadata = {
+  title: "Conditions générales de vente",
+  description: "Conditions générales de vente du site Fasshon : commande, paiement, livraison, retours.",
+  alternates: { canonical: "/cgv" },
+};
 
 export default function CgvPage() {
   return (

@@ -2,7 +2,11 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { BrandLogo } from "@/components/BrandLogo";
 
-export const metadata = { title: "Nos marques" };
+export const metadata = {
+  title: "Nos marques",
+  description: "Découvrez les marques françaises indépendantes réunies sur Fasshon : beauté, soins et bien-être.",
+  alternates: { canonical: "/marques" },
+};
 
 export default async function MarquesPage() {
   const brands = await prisma.brand.findMany({

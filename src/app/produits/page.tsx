@@ -9,6 +9,8 @@ import { CatalogueResults } from "@/components/CatalogueResults";
 
 export const metadata = {
   title: "Catalogue",
+  description: "Le catalogue Fasshon : parfums, maquillage, soins et compléments de nos marques françaises.",
+  alternates: { canonical: "/produits" },
 };
 
 export default async function ProduitsPage({

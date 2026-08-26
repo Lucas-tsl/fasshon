@@ -1,7 +1,11 @@
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { LegalPlaceholder as Placeholder } from "@/components/LegalPlaceholder";
 
-export const metadata = { title: "Accessibilité" };
+export const metadata = {
+  title: "Accessibilité",
+  description: "Déclaration d'accessibilité du site Fasshon, concept store multi-marques.",
+  alternates: { canonical: "/accessibilite" },
+};
 
 export default function AccessibilitePage() {
   return (

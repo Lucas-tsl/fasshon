@@ -9,6 +9,30 @@ import { BrandSocialLinks } from "@/components/BrandSocialLinks";
 import { TypeQuickNav } from "@/components/TypeQuickNav";
 import { slugifyType } from "@/lib/product-type";
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const brand = await prisma.brand.findUnique({
+    where: { slug },
+    select: { name: true, description: true },
+  });
+  if (!brand) return { title: "Marque introuvable" };
+
+  const description =
+    brand.description ??
+    `Découvrez les produits ${brand.name} sur Fasshon, concept store multi-marques français.`;
+
+  return {
+    title: brand.name,
+    description,
+    alternates: { canonical: `/marques/${slug}` },
+    openGraph: { title: brand.name, description },
+  };
+}
+
 export default async function MarquePage({
   params,
 }: {
@@ -43,7 +67,9 @@ export default async function MarquePage({
     <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-10 pb-28">
       <div className="flex flex-col gap-4">
         <Breadcrumb items={[{ label: "Marques", href: "/marques" }, { label: brand.name }]} />
-        <BrandLogo name={brand.name} logoPath={brand.logoPath} className="h-10" />
+        <h1>
+          <BrandLogo name={brand.name} logoPath={brand.logoPath} className="h-10" />
+        </h1>
         {brand.description ? (
           <p className="max-w-xl text-sm text-foreground/60">{brand.description}</p>
         ) : null}

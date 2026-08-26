@@ -1,7 +1,11 @@
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { LegalPlaceholder as Placeholder } from "@/components/LegalPlaceholder";
 
-export const metadata = { title: "Mentions légales" };
+export const metadata = {
+  title: "Mentions légales",
+  description: "Mentions légales du site Fasshon : éditeur, hébergeur et informations légales.",
+  alternates: { canonical: "/mentions-legales" },
+};
 
 export default function MentionsLegalesPage() {
   return (

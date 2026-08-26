@@ -6,6 +6,26 @@ import { ProductCard } from "@/components/ProductCard";
 import { toCardProduct } from "@/lib/product-display";
 import { getWishlistedProductIds } from "@/lib/wishlist";
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const post = await prisma.blogPost.findUnique({
+    where: { slug },
+    select: { title: true, excerpt: true },
+  });
+  if (!post) return { title: "Article introuvable" };
+
+  return {
+    title: post.title,
+    description: post.excerpt,
+    alternates: { canonical: `/blog/${slug}` },
+    openGraph: { title: post.title, description: post.excerpt, type: "article" },
+  };
+}
+
 export default async function BlogPostPage({
   params,
 }: {

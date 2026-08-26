@@ -3,7 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { BlogImage } from "@/components/BlogImage";
 
-export const metadata = { title: "Blog" };
+export const metadata = {
+  title: "Blog",
+  description: "Conseils beauté, soins et bien-être par Fasshon, concept store multi-marques français.",
+  alternates: { canonical: "/blog" },
+};
 
 export default async function BlogPage() {
   const posts = await prisma.blogPost.findMany({

@@ -4,6 +4,11 @@ import { recordOrderFromCheckoutSession } from "@/lib/orders";
 import { formatPrice } from "@/lib/format";
 import { ClearCartOnMount } from "@/components/ClearCartOnMount";
 
+export const metadata = {
+  title: "Commande confirmée",
+  robots: { index: false, follow: false },
+};
+
 export default async function CommandeSuccesPage({
   searchParams,
 }: {

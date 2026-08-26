@@ -12,6 +12,7 @@ import { getCurrentUser } from "@/lib/user-auth";
 import { AccountIcon } from "@/components/AccountIcon";
 import { SearchBar } from "@/components/SearchBar";
 import { MobileMenu } from "@/components/MobileMenu";
+import { SITE_URL } from "@/lib/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,11 +36,34 @@ const bebasNeue = Bebas_Neue({
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Fasshon",
     template: "%s · Fasshon",
   },
   description: "Concept store multi-marques — beauté, soins naturels, bien-être et senteurs.",
+  keywords: [
+    "concept store",
+    "beauté",
+    "soins naturels",
+    "bien-être",
+    "senteurs",
+    "parfums",
+    "maquillage français",
+    "marques françaises",
+  ],
+  authors: [{ name: "Fasshon" }],
+  creator: "Fasshon",
+  publisher: "Fasshon",
+  robots: { index: true, follow: true },
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    siteName: "Fasshon",
+    title: "Fasshon",
+    description: "Concept store multi-marques — beauté, soins naturels, bien-être et senteurs.",
+  },
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {

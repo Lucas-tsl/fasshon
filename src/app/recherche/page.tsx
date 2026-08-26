@@ -7,7 +7,11 @@ import { BlogImage } from "@/components/BlogImage";
 import { toCardProduct } from "@/lib/product-display";
 import { getWishlistedProductIds } from "@/lib/wishlist";
 
-export const metadata = { title: "Recherche" };
+export const metadata = {
+  title: "Recherche",
+  description: "Recherchez un produit, une marque ou un article sur Fasshon.",
+  robots: { index: false, follow: true },
+};
 
 export default async function RecherchePage({
   searchParams,
